@@ -113,6 +113,16 @@ git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repo
 git push codecommit main
 ```
 
+### Troubleshooting: 403 on Push
+
+If you get a 403 error when pushing to CodeCommit, macOS Keychain may have cached stale credentials that take precedence over the AWS credential helper. Clear them with:
+
+```bash
+printf "protocol=https\nhost=git-codecommit.us-east-1.amazonaws.com\n" | git credential-osxkeychain erase
+```
+
+Then retry the push.
+
 ## CDK Commands
 
 ```bash
