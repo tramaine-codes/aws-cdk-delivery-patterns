@@ -34,8 +34,8 @@ export class DeliveryPipelineStack extends cdk.Stack {
               'runtime-versions': {
                 nodejs: 24,
               },
+              commands: ['npm install -g npm@11.10.1'],
             },
-            commands: ['npm install -g npm@11.10.1'],
           },
         }),
       },
