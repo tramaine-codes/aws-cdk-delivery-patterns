@@ -69,10 +69,10 @@ describe('DeliveryPipelineStack', () => {
     expect(Object.keys(projects).length).toBeGreaterThanOrEqual(2);
   });
 
-  test('installs npm 11.8.0', () => {
+  test('installs npm 11.10.1', () => {
     template.hasResourceProperties('AWS::CodeBuild::Project', {
       Source: Match.objectLike({
-        BuildSpec: Match.stringLikeRegexp('npm install -g npm@11.8.0'),
+        BuildSpec: Match.stringLikeRegexp('npm install -g npm@11.10.1'),
       }),
     });
   });
