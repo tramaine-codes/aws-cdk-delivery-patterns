@@ -1,21 +1,15 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, test } from 'vitest';
-import { AwsCdkDeliveryPatternsPipelineStack } from '../../lib/aws-cdk-delivery-patterns-pipeline-stack.js';
-import { AwsCdkDeliveryPatternsRepositoryStack } from '../../lib/aws-cdk-delivery-patterns-repository-stack.js';
+import { DeliveryPipelineStack } from '../../../lib/pipeline/delivery-pipeline-stack.js';
+import { RepositoryStack } from '../../../lib/repository/repository-stack.js';
 
-describe('AwsCdkDeliveryPatternsPipelineStack', () => {
+describe('DeliveryPipelineStack', () => {
   const app = new cdk.App();
-  const { repository } = new AwsCdkDeliveryPatternsRepositoryStack(
-    app,
-    'TestRepositoryStack',
-    {}
-  );
-  const stack = new AwsCdkDeliveryPatternsPipelineStack(
-    app,
-    'TestPipelineStack',
-    { repository }
-  );
+  const { repository } = new RepositoryStack(app, 'TestRepositoryStack', {});
+  const stack = new DeliveryPipelineStack(app, 'TestPipelineStack', {
+    repository,
+  });
   const template = Template.fromStack(stack);
 
   test('creates a CodePipeline pipeline', () => {

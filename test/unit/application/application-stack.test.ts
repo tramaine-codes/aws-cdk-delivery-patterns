@@ -1,11 +1,11 @@
 import { Template } from 'aws-cdk-lib/assertions';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, test } from 'vitest';
-import { AwsCdkDeliveryPatternsAppStack } from '../../lib/aws-cdk-delivery-patterns-app-stack.js';
+import { ApplicationStack } from '../../../lib/application/application-stack.js';
 
-describe('AwsCdkDeliveryPatternsAppStack', () => {
+describe('ApplicationStack', () => {
   const app = new cdk.App();
-  const stack = new AwsCdkDeliveryPatternsAppStack(app, 'TestAppStack');
+  const stack = new ApplicationStack(app, 'TestAppStack', {});
   const template = Template.fromStack(stack);
 
   test('creates an S3 bucket', () => {
