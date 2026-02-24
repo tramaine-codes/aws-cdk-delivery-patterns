@@ -13,6 +13,7 @@
     "@types/node": "24.10.13",
     "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1107.0",
+    "cdk-nag": "2.37.55",
     "del-cli": "7.0.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
