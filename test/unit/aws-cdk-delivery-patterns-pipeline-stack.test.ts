@@ -50,4 +50,28 @@ describe('AwsCdkDeliveryPatternsPipelineStack', () => {
       }),
     });
   });
+
+  test('uses the standard 7.0 build image', () => {
+    template.hasResourceProperties('AWS::CodeBuild::Project', {
+      Environment: Match.objectLike({
+        Image: 'aws/codebuild/standard:7.0',
+      }),
+    });
+  });
+
+  test('sets Node 24 as the runtime version', () => {
+    template.hasResourceProperties('AWS::CodeBuild::Project', {
+      Source: Match.objectLike({
+        BuildSpec: Match.stringLikeRegexp('"nodejs": 24'),
+      }),
+    });
+  });
+
+  test('installs npm 11.8.0', () => {
+    template.hasResourceProperties('AWS::CodeBuild::Project', {
+      Source: Match.objectLike({
+        BuildSpec: Match.stringLikeRegexp('npm install -g npm@11.8.0'),
+      }),
+    });
+  });
 });
