@@ -19,6 +19,7 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
 
 - **Linter/Formatter**: [Biome](https://biomejs.dev/) (not ESLint/Prettier). Single quotes, 2-space indent, trailing commas (ES5), 80-char line width.
 - **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests live in `test/unit/`.
+- **Security checks**: [cdk-nag](https://github.com/cdklabs/cdk-nag) with `AwsSolutionsChecks` applied in `bin/aws-cdk-delivery-patterns.ts`. Runs automatically during `cdk synth` — synthesis fails on unaddressed violations. Use `NagSuppressions` to suppress findings that cannot be fixed in code; always include a `reason`.
 - **Commit convention**: Conventional Commits enforced via commitlint + husky.
 - **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files).
 

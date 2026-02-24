@@ -101,14 +101,13 @@ Authentication uses the AWS CLI CodeCommit credential helper. Add the following 
 ```ini
 [credential]
   helper = !aws codecommit credential-helper $@
-  useHttpPath = true
 ```
 
 On macOS, also configure the CodeCommit URL to use only the AWS credential helper, preventing Keychain from intercepting or caching credentials:
 
 ```bash
 git config --global credential.https://git-codecommit.us-east-1.amazonaws.com.helper ""
-git config --global --add credential.https://git-codecommit.us-east-1.amazonaws.com.helper "!aws codecommit credential-helper $@"
+git config --global --add credential.https://git-codecommit.us-east-1.amazonaws.com.helper "!aws codecommit credential-helper"
 ```
 
 The empty string clears any inherited global helpers for that URL, and the second command adds the AWS helper as the sole credential provider.
@@ -135,10 +134,26 @@ printf "protocol=https\nhost=git-codecommit.us-east-1.amazonaws.com\n" | git cre
 
 Then retry the push.
 
+## Security Checks (cdk-nag)
+
+[cdk-nag](https://github.com/cdklabs/cdk-nag) runs `AwsSolutionsChecks` during synthesis (`npx cdk synth`). Synthesis fails if any unaddressed violations are found.
+
+### Findings addressed in code
+
+**`AwsSolutions-S1`** — Pipeline artifacts bucket missing server access logging. Fixed by creating a dedicated access logs bucket and passing it as `serverAccessLogsBucket` on a custom `artifactBucket` provided to `CodePipeline`. The CDK Pipelines-generated bucket does not support access logging configuration, so a custom bucket is required.
+
+### Findings suppressed
+
+Suppressions are applied at the stack level via `NagSuppressions.addStackSuppressions` in `DeliveryPipelineStack`.
+
+**`AwsSolutions-CB4`** — CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing). `CodeBuildOptions` does not expose an `encryptionKey` property, so there is no API surface to set a KMS key on these projects directly.
+
+**`AwsSolutions-IAM5`** — CDK Pipelines and CodePipeline generate IAM policies with wildcard actions (e.g. `s3:GetObject*`, `s3:List*`) and wildcard resources on the pipeline role, CodeBuild roles, and the CodeCommit action role. These policies are produced entirely by CDK internals and cannot be further constrained through the available construct APIs.
+
 ## CDK Commands
 
 ```bash
-# Synthesize CloudFormation template
+# Synthesize CloudFormation template (also runs cdk-nag checks)
 npx cdk synth
 
 # Compare deployed stack with current state
@@ -165,6 +180,7 @@ The pre-commit hook runs `npm run build:ci` and `lint-staged` (Biome format + li
 | [TypeScript](https://www.typescriptlang.org/)            | Language (type-check only; runtime via `tsx`) |
 | [Vitest](https://vitest.dev/)                            | Unit test runner                              |
 | [Biome](https://biomejs.dev/)                            | Linter and formatter                          |
+| [cdk-nag](https://github.com/cdklabs/cdk-nag)           | CDK security and compliance checks            |
 | [Husky](https://typicode.github.io/husky/)               | Git hooks                                     |
 | [commitlint](https://commitlint.js.org/)                 | Conventional Commits enforcement              |
 
