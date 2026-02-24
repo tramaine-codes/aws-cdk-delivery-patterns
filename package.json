@@ -36,5 +36,9 @@
     "watch": "tsc -w"
   },
   "type": "module",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "volta": {
+    "node": "24.13.1",
+    "npm": "11.8.0"
+  }
 }
