@@ -2,6 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Architecture
+
+This is an AWS CDK TypeScript project. The CDK app is executed directly from TypeScript via `tsx` (no compile step needed at runtime).
+
+- **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates stacks and passes them to `cdk.App`.
+- **`lib/`** — CDK stack definitions. Each file exports a `Stack` subclass.
+- **`test/unit/`** — Vitest unit tests. CDK stack assertions use `aws-cdk-lib/assertions` (`Template.fromStack`).
+
+`tsconfig.json` has `noEmit: true` — TypeScript is used for type-checking only. The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
+
+## Tooling
+
+- **Linter/Formatter**: [Biome](https://biomejs.dev/) (not ESLint/Prettier). Single quotes, 2-space indent, trailing commas (ES5), 80-char line width.
+- **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests live in `test/unit/`.
+- **Commit convention**: Conventional Commits enforced via commitlint + husky.
+- **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files).
+
 ## Commands
 
 ```bash
@@ -38,22 +55,14 @@ npx cdk diff
 npx cdk deploy
 ```
 
-## Architecture
+## TypeScript Conventions
 
-This is an AWS CDK TypeScript project. The CDK app is executed directly from TypeScript via `tsx` (no compile step needed at runtime).
-
-- **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates stacks and passes them to `cdk.App`.
-- **`lib/`** — CDK stack definitions. Each file exports a `Stack` subclass.
-- **`test/unit/`** — Vitest unit tests. CDK stack assertions use `aws-cdk-lib/assertions` (`Template.fromStack`).
-
-`tsconfig.json` has `noEmit: true` — TypeScript is used for type-checking only. The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
-
-## Tooling
-
-- **Linter/Formatter**: [Biome](https://biomejs.dev/) (not ESLint/Prettier). Single quotes, 2-space indent, trailing commas (ES5), 80-char line width.
-- **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests live in `test/unit/`.
-- **Commit convention**: Conventional Commits enforced via commitlint + husky.
-- **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files).
+- Always sort lists of field names alphabetically (interface properties, object literals, enum members, etc.)
 
 ## Git Conventions
+
 - Do not reference Claude, Claude Code, or AI assistance in commit messages
+
+## Workflow
+
+- After each code change, run `npm run build` and `npm test` to verify nothing is broken
