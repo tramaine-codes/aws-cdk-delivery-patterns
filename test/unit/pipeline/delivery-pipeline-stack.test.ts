@@ -69,6 +69,55 @@ describe('DeliveryPipelineStack', () => {
     expect(Object.keys(projects).length).toBeGreaterThanOrEqual(2);
   });
 
+  test('creates a KMS key with an alias for pipeline artifacts', () => {
+    template.hasResourceProperties('AWS::KMS::Alias', {
+      AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
+    });
+  });
+
+  test('schedules the KMS key for deletion on stack removal', () => {
+    template.hasResource('AWS::KMS::Key', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete',
+    });
+  });
+
+  test('deletes the artifacts bucket on stack removal', () => {
+    template.hasResource('AWS::S3::Bucket', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete',
+      Properties: Match.objectLike({
+        BucketEncryption: Match.objectLike({
+          ServerSideEncryptionConfiguration: Match.arrayWith([
+            Match.objectLike({
+              ServerSideEncryptionByDefault: Match.objectLike({
+                SSEAlgorithm: 'aws:kms',
+              }),
+            }),
+          ]),
+        }),
+      }),
+    });
+  });
+
+  test('deletes the access logs bucket on stack removal', () => {
+    template.hasResource('AWS::S3::Bucket', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete',
+      Properties: Match.objectLike({
+        BucketEncryption: Match.objectLike({
+          ServerSideEncryptionConfiguration: Match.arrayWith([
+            Match.objectLike({
+              ServerSideEncryptionByDefault: Match.objectLike({
+                SSEAlgorithm: 'AES256',
+              }),
+            }),
+          ]),
+        }),
+      }),
+    });
+  });
+
   test('installs npm 11.10.1', () => {
     template.hasResourceProperties('AWS::CodeBuild::Project', {
       Source: Match.objectLike({
