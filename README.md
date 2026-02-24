@@ -12,12 +12,44 @@ An AWS CDK project written in TypeScript for exploring and implementing cloud de
 
 ## Getting Started
 
-```bash
-# Install dependencies
-npm install
+**1. Install dependencies**
 
-# Bootstrap your AWS environment (first-time only)
+```bash
+npm install
+```
+
+**2. Bootstrap your AWS environment** *(first-time only)*
+
+```bash
 npx cdk bootstrap
+```
+
+**3. Deploy the repository stack**
+
+Provisions the CodeCommit repository:
+
+```bash
+npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
+```
+
+**4. Configure the CodeCommit remote**
+
+See [CodeCommit Setup](#codecommit-setup) for credential helper configuration, then add the remote:
+
+```bash
+git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-cdk-delivery-patterns
+```
+
+**5. Deploy the pipeline stack**
+
+```bash
+npx cdk deploy AwsCdkDeliveryPatternsPipelineStack
+```
+
+**6. Push to CodeCommit to trigger the pipeline**
+
+```bash
+git push codecommit main
 ```
 
 ## Project Structure
@@ -90,12 +122,6 @@ This repository is mirrored across two remotes:
 
 ### CodeCommit Setup
 
-The `RepositoryStack` CDK stack provisions the CodeCommit repository. Deploy it before configuring the remote:
-
-```bash
-npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
-```
-
 Authentication uses the AWS CLI CodeCommit credential helper. Add the following to your global git config (`~/.gitconfig`):
 
 ```ini
@@ -111,18 +137,6 @@ git config --global --add credential.https://git-codecommit.us-east-1.amazonaws.
 ```
 
 The empty string clears any inherited global helpers for that URL, and the second command adds the AWS helper as the sole credential provider.
-
-Then add the remote:
-
-```bash
-git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-cdk-delivery-patterns
-```
-
-### Pushing to CodeCommit
-
-```bash
-git push codecommit main
-```
 
 ### Troubleshooting: 403 on Push
 
