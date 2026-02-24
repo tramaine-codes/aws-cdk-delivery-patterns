@@ -1,5 +1,7 @@
 # aws-cdk-delivery-patterns
 
+[![GitHub](https://img.shields.io/badge/GitHub-tramaine--codes%2Faws--cdk--delivery--patterns-blue?logo=github)](https://github.com/tramaine-codes/aws-cdk-delivery-patterns)
+
 An AWS CDK project written in TypeScript for exploring and implementing cloud delivery patterns on AWS.
 
 ## Prerequisites

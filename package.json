@@ -20,7 +20,12 @@
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   },
+  "homepage": "https://github.com/tramaine-codes/aws-cdk-delivery-patterns",
   "name": "aws-cdk-delivery-patterns",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tramaine-codes/aws-cdk-delivery-patterns.git"
+  },
   "scripts": {
     "build": "tsc",
     "build:ci": "npm run clean && npm test && tsc",
