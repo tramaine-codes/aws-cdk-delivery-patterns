@@ -5,7 +5,7 @@ import type { Construct } from 'constructs';
 export class AwsCdkDeliveryPatternsRepositoryStack extends cdk.Stack {
   readonly repository: codecommit.Repository;
 
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: cdk.StackProps) {
     super(scope, id, {
       description:
         'Provisions the CodeCommit repository for CDK delivery patterns',

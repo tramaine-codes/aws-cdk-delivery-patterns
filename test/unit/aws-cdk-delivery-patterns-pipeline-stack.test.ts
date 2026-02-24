@@ -8,7 +8,8 @@ describe('AwsCdkDeliveryPatternsPipelineStack', () => {
   const app = new cdk.App();
   const { repository } = new AwsCdkDeliveryPatternsRepositoryStack(
     app,
-    'TestRepositoryStack'
+    'TestRepositoryStack',
+    {}
   );
   const stack = new AwsCdkDeliveryPatternsPipelineStack(
     app,

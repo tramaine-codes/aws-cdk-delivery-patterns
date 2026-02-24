@@ -6,9 +6,9 @@ import {
   ShellStep,
 } from 'aws-cdk-lib/pipelines';
 import type { Construct } from 'constructs';
+import { AwsCdkDeliveryPatternsAppStage } from './aws-cdk-delivery-patterns-app-stage.js';
 
-export interface AwsCdkDeliveryPatternsPipelineStackProps
-  extends cdk.StackProps {
+interface AwsCdkDeliveryPatternsPipelineStackProps extends cdk.StackProps {
   readonly repository: codecommit.IRepository;
 }
 
@@ -23,12 +23,17 @@ export class AwsCdkDeliveryPatternsPipelineStack extends cdk.Stack {
       ...props,
     });
 
-    new CodePipeline(this, 'Pipeline', {
+    const pipeline = new CodePipeline(this, 'Pipeline', {
       pipelineName: 'AwsCdkDeliveryPatternsPipeline',
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.codeCommit(props.repository, 'main'),
         commands: ['npm ci', 'npm run build', 'npx cdk synth'],
       }),
     });
+    const stage = new AwsCdkDeliveryPatternsAppStage(this, 'Dev', {
+      env: props.env,
+    });
+
+    pipeline.addStage(stage);
   }
 }

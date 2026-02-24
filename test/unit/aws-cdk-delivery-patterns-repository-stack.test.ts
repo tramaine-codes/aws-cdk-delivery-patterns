@@ -8,7 +8,8 @@ describe('AwsCdkDeliveryPatternsRepositoryStack', () => {
     const app = new cdk.App();
     const stack = new AwsCdkDeliveryPatternsRepositoryStack(
       app,
-      'TestRepositoryStack'
+      'TestRepositoryStack',
+      {}
     );
     const template = Template.fromStack(stack);
 
