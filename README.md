@@ -101,6 +101,12 @@ Authentication uses the AWS CLI CodeCommit credential helper. Add the following 
   useHttpPath = true
 ```
 
+On macOS, also disable the Keychain credential helper for CodeCommit to prevent it from caching and serving stale credentials:
+
+```bash
+git config --global credential.https://git-codecommit.us-east-1.amazonaws.com.helper ""
+```
+
 Then add the remote:
 
 ```bash
@@ -112,16 +118,6 @@ git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repo
 ```bash
 git push codecommit main
 ```
-
-### Troubleshooting: 403 on Push
-
-If you get a 403 error when pushing to CodeCommit, macOS Keychain may have cached stale credentials that take precedence over the AWS credential helper. Clear them with:
-
-```bash
-printf "protocol=https\nhost=git-codecommit.us-east-1.amazonaws.com\n" | git credential-osxkeychain erase
-```
-
-Then retry the push.
 
 ## CDK Commands
 
