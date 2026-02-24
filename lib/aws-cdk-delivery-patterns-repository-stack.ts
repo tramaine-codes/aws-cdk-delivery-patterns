@@ -3,6 +3,8 @@ import * as cdk from 'aws-cdk-lib/core';
 import type { Construct } from 'constructs';
 
 export class AwsCdkDeliveryPatternsRepositoryStack extends cdk.Stack {
+  readonly repository: codecommit.Repository;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, {
       description:
@@ -10,9 +12,13 @@ export class AwsCdkDeliveryPatternsRepositoryStack extends cdk.Stack {
       ...props,
     });
 
-    new codecommit.Repository(this, 'AwsCdkDeliveryPatternsRepositoryStack', {
-      description: 'CDK delivery patterns and CI/CD prototyping',
-      repositoryName: 'aws-cdk-delivery-patterns',
-    });
+    this.repository = new codecommit.Repository(
+      this,
+      'AwsCdkDeliveryPatternsRepositoryStack',
+      {
+        description: 'CDK delivery patterns and CI/CD prototyping',
+        repositoryName: 'aws-cdk-delivery-patterns',
+      }
+    );
   }
 }
