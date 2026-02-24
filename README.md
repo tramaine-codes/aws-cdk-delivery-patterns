@@ -23,10 +23,13 @@ npx cdk bootstrap
 ## Project Structure
 
 ```
-bin/        # CDK app entry point
-lib/        # Stack definitions
+bin/                  # CDK app entry point
+lib/
+  application/        # ApplicationStack and ApplicationStage
+  pipeline/           # DeliveryPipelineStack
+  repository/         # RepositoryStack
 test/
-  unit/     # Vitest unit tests
+  unit/               # Vitest unit tests
 ```
 
 ## Tooling Configuration
@@ -87,7 +90,7 @@ This repository is mirrored across two remotes:
 
 ### CodeCommit Setup
 
-The `AwsCdkDeliveryPatternsRepositoryStack` CDK stack provisions the CodeCommit repository. Deploy it before configuring the remote:
+The `RepositoryStack` CDK stack provisions the CodeCommit repository. Deploy it before configuring the remote:
 
 ```bash
 npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack

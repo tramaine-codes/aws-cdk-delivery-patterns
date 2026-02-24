@@ -7,7 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an AWS CDK TypeScript project. The CDK app is executed directly from TypeScript via `tsx` (no compile step needed at runtime).
 
 - **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates stacks and passes them to `cdk.App`.
-- **`lib/`** — CDK stack definitions. Each file exports a `Stack` subclass.
+- **`lib/`** — CDK stack definitions, organized by domain:
+  - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
+  - **`lib/pipeline/`** — `DeliveryPipelineStack`
+  - **`lib/repository/`** — `RepositoryStack`
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use `aws-cdk-lib/assertions` (`Template.fromStack`).
 
 `tsconfig.json` has `noEmit: true` — TypeScript is used for type-checking only. The CDK CLI runs the app via `npx tsx` (configured in `cdk.json`).
