@@ -1,0 +1,40 @@
+{
+  "bin": {
+    "aws-cdk-delivery-patterns": "bin/aws-cdk-delivery-patterns.js"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.240.0",
+    "constructs": "10.5.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.4",
+    "@commitlint/cli": "20.4.2",
+    "@commitlint/config-conventional": "20.4.2",
+    "@types/node": "24.10.13",
+    "@vitest/coverage-v8": "4.0.18",
+    "aws-cdk": "2.1107.0",
+    "del-cli": "7.0.0",
+    "husky": "9.1.7",
+    "lint-staged": "16.2.7",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  },
+  "name": "aws-cdk-delivery-patterns",
+  "scripts": {
+    "build": "tsc",
+    "build:ci": "npm run clean && npm test && tsc",
+    "cdk": "cdk",
+    "clean": "del-cli coverage",
+    "format": "biome format --fix --no-errors-on-unmatched .",
+    "lint": "biome lint --no-errors-on-unmatched .",
+    "lint:fix": "biome lint --fix --no-errors-on-unmatched .",
+    "prepare": "husky",
+    "test": "vitest run --dir test/unit --config ./vite.config.unit.ts",
+    "test:cov": "vitest run --coverage --dir test/unit --config ./vite.config.unit.ts",
+    "test:watch": "vitest --dir test/unit --config ./vite.config.unit.ts",
+    "watch": "tsc -w"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}
