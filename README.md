@@ -76,6 +76,43 @@ npx vitest run --dir test/unit --config ./vite.config.unit.ts test/unit/<filenam
 npm run test:cov
 ```
 
+## Source Control
+
+This repository is mirrored across two remotes:
+
+| Remote       | URL                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `origin`     | `git@github.com:tramaine-codes/aws-cdk-delivery-patterns.git`                       |
+| `codecommit` | `https://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-cdk-delivery-patterns` |
+
+### CodeCommit Setup
+
+The `AwsCdkDeliveryPatternsRepositoryStack` CDK stack provisions the CodeCommit repository. Deploy it before configuring the remote:
+
+```bash
+npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
+```
+
+Authentication uses the AWS CLI CodeCommit credential helper. Add the following to your global git config (`~/.gitconfig`):
+
+```ini
+[credential]
+  helper = !aws codecommit credential-helper $@
+  useHttpPath = true
+```
+
+Then add the remote:
+
+```bash
+git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-cdk-delivery-patterns
+```
+
+### Pushing to CodeCommit
+
+```bash
+git push codecommit main
+```
+
 ## CDK Commands
 
 ```bash
