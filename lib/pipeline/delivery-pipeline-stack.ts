@@ -21,13 +21,7 @@ export class DeliveryPipelineStack extends cdk.Stack {
     });
 
     const pipeline = new CodePipeline(this, 'Pipeline', {
-      pipelineName: 'AwsCdkDeliveryPatternsPipeline',
-      selfMutation: true,
-      synth: new ShellStep('Synth', {
-        input: CodePipelineSource.codeCommit(props.repository, 'main'),
-        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
-      }),
-      synthCodeBuildDefaults: {
+      codeBuildDefaults: {
         buildEnvironment: {
           buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
         },
@@ -43,6 +37,12 @@ export class DeliveryPipelineStack extends cdk.Stack {
           },
         }),
       },
+      pipelineName: 'AwsCdkDeliveryPatternsPipeline',
+      selfMutation: true,
+      synth: new ShellStep('Synth', {
+        input: CodePipelineSource.codeCommit(props.repository, 'main'),
+        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
+      }),
     });
     const stage = new ApplicationStage(this, 'Dev', {
       env: props.env,

@@ -45,8 +45,8 @@ describe('DeliveryPipelineStack', () => {
     });
   });
 
-  test('uses the standard 7.0 build image', () => {
-    template.hasResourceProperties('AWS::CodeBuild::Project', {
+  test('uses the standard 7.0 build image for all CodeBuild projects', () => {
+    template.allResourcesProperties('AWS::CodeBuild::Project', {
       Environment: Match.objectLike({
         Image: 'aws/codebuild/standard:7.0',
       }),
