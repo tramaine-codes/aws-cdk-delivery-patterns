@@ -101,10 +101,10 @@ Authentication uses the AWS CLI CodeCommit credential helper. Add the following 
   useHttpPath = true
 ```
 
-On macOS, also disable the Keychain credential helper for CodeCommit to prevent it from caching and serving stale credentials:
+On macOS, also pin the AWS credential helper directly to the CodeCommit URL to prevent the Keychain helper from intercepting requests with stale credentials:
 
 ```bash
-git config --global credential.https://git-codecommit.us-east-1.amazonaws.com.helper ""
+git config --global credential.https://git-codecommit.us-east-1.amazonaws.com.helper "!aws codecommit credential-helper $@"
 ```
 
 Then add the remote:
