@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import type * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import {
@@ -23,29 +24,48 @@ export class DeliveryPipelineStack extends cdk.Stack {
       ...props,
     });
 
-    const key = new kms.Key(this, 'PipelineKey', {
+    const artifactsKey = new kms.Key(this, 'ArtifactsKey', {
       alias: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
       enableKeyRotation: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    const accessLogsBucket = new s3.Bucket(this, 'ArtifactsAccessLogsBucket', {
-      autoDeleteObjects: true,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      enforceSSL: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
+    const serverAccessLogsBucket = new s3.Bucket(
+      this,
+      'ServerAccessLogsBucket',
+      {
+        autoDeleteObjects: true,
+        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+        encryption: s3.BucketEncryption.S3_MANAGED,
+        enforceSSL: true,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }
+    );
 
     const artifactBucket = new s3.Bucket(this, 'ArtifactsBucket', {
       autoDeleteObjects: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.KMS,
-      encryptionKey: key,
+      encryptionKey: artifactsKey,
       enforceSSL: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      serverAccessLogsBucket: accessLogsBucket,
+      serverAccessLogsBucket,
     });
+
+    artifactBucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        actions: ['s3:PutObject'],
+        conditions: {
+          StringNotEqualsIfExists: {
+            's3:x-amz-server-side-encryption-aws-kms-key-id':
+              artifactsKey.keyArn,
+          },
+        },
+        effect: iam.Effect.DENY,
+        principals: [new iam.AnyPrincipal()],
+        resources: [artifactBucket.arnForObjects('*')],
+      })
+    );
 
     const pipeline = new CodePipeline(this, 'Pipeline', {
       artifactBucket,

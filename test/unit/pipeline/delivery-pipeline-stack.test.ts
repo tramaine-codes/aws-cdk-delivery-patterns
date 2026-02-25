@@ -100,6 +100,25 @@ describe('DeliveryPipelineStack', () => {
     });
   });
 
+  test('denies PutObject requests that do not use the artifacts KMS key', () => {
+    template.hasResourceProperties('AWS::S3::BucketPolicy', {
+      PolicyDocument: Match.objectLike({
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: 's3:PutObject',
+            Condition: Match.objectLike({
+              StringNotEqualsIfExists: Match.objectLike({
+                's3:x-amz-server-side-encryption-aws-kms-key-id':
+                  Match.anyValue(),
+              }),
+            }),
+            Effect: 'Deny',
+          }),
+        ]),
+      }),
+    });
+  });
+
   test('deletes the access logs bucket on stack removal', () => {
     template.hasResource('AWS::S3::Bucket', {
       DeletionPolicy: 'Delete',
