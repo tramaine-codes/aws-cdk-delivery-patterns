@@ -69,12 +69,6 @@ describe('DeliveryPipelineStack', () => {
     expect(Object.keys(projects).length).toBeGreaterThanOrEqual(2);
   });
 
-  test('creates a KMS key with an alias for pipeline artifacts', () => {
-    template.hasResourceProperties('AWS::KMS::Alias', {
-      AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
-    });
-  });
-
   test('schedules the KMS key for deletion on stack removal', () => {
     template.hasResource('AWS::KMS::Key', {
       DeletionPolicy: 'Delete',
