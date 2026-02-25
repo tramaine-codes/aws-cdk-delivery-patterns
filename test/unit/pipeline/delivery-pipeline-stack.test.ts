@@ -1,14 +1,21 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, expect, test } from 'vitest';
+import { LoggingStack } from '../../../lib/logging/logging-stack.js';
 import { DeliveryPipelineStack } from '../../../lib/pipeline/delivery-pipeline-stack.js';
 import { RepositoryStack } from '../../../lib/repository/repository-stack.js';
 
 describe('DeliveryPipelineStack', () => {
   const app = new cdk.App();
+  const { serverAccessLogsBucket } = new LoggingStack(
+    app,
+    'TestLoggingStack',
+    {}
+  );
   const { repository } = new RepositoryStack(app, 'TestRepositoryStack', {});
   const stack = new DeliveryPipelineStack(app, 'TestPipelineStack', {
     repository,
+    serverAccessLogsBucket,
   });
   const template = Template.fromStack(stack);
 
@@ -67,74 +74,6 @@ describe('DeliveryPipelineStack', () => {
     });
 
     expect(Object.keys(projects).length).toBeGreaterThanOrEqual(2);
-  });
-
-  test('creates a KMS key with an alias for pipeline artifacts', () => {
-    template.hasResourceProperties('AWS::KMS::Alias', {
-      AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
-    });
-  });
-
-  test('schedules the KMS key for deletion on stack removal', () => {
-    template.hasResource('AWS::KMS::Key', {
-      DeletionPolicy: 'Delete',
-      UpdateReplacePolicy: 'Delete',
-    });
-  });
-
-  test('deletes the artifacts bucket on stack removal', () => {
-    template.hasResource('AWS::S3::Bucket', {
-      DeletionPolicy: 'Delete',
-      UpdateReplacePolicy: 'Delete',
-      Properties: Match.objectLike({
-        BucketEncryption: Match.objectLike({
-          ServerSideEncryptionConfiguration: Match.arrayWith([
-            Match.objectLike({
-              ServerSideEncryptionByDefault: Match.objectLike({
-                SSEAlgorithm: 'aws:kms',
-              }),
-            }),
-          ]),
-        }),
-      }),
-    });
-  });
-
-  test('denies PutObject requests that do not use the artifacts KMS key', () => {
-    template.hasResourceProperties('AWS::S3::BucketPolicy', {
-      PolicyDocument: Match.objectLike({
-        Statement: Match.arrayWith([
-          Match.objectLike({
-            Action: 's3:PutObject',
-            Condition: Match.objectLike({
-              StringNotEqualsIfExists: Match.objectLike({
-                's3:x-amz-server-side-encryption-aws-kms-key-id':
-                  Match.anyValue(),
-              }),
-            }),
-            Effect: 'Deny',
-          }),
-        ]),
-      }),
-    });
-  });
-
-  test('deletes the access logs bucket on stack removal', () => {
-    template.hasResource('AWS::S3::Bucket', {
-      DeletionPolicy: 'Delete',
-      UpdateReplacePolicy: 'Delete',
-      Properties: Match.objectLike({
-        BucketEncryption: Match.objectLike({
-          ServerSideEncryptionConfiguration: Match.arrayWith([
-            Match.objectLike({
-              ServerSideEncryptionByDefault: Match.objectLike({
-                SSEAlgorithm: 'AES256',
-              }),
-            }),
-          ]),
-        }),
-      }),
-    });
   });
 
   test('installs npm 11.10.1', () => {

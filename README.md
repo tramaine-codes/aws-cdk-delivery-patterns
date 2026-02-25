@@ -24,11 +24,12 @@ npm install
 npx cdk bootstrap
 ```
 
-**3. Deploy the repository stack**
+**3. Deploy the logging and repository stacks**
 
-Provisions the CodeCommit repository:
+These stacks are independent and can be deployed in either order. The logging stack provisions the shared S3 server access logs bucket used by all pipeline-level resources. The repository stack provisions the CodeCommit repository.
 
 ```bash
+npx cdk deploy AwsCdkDeliveryPatternsLoggingStack
 npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
 ```
 
@@ -41,6 +42,8 @@ git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repo
 ```
 
 **5. Deploy the pipeline stack**
+
+The pipeline stack depends on both the logging and repository stacks, so those must be deployed first.
 
 ```bash
 npx cdk deploy AwsCdkDeliveryPatternsPipelineStack
@@ -57,11 +60,18 @@ git push codecommit main
 ```
 bin/                  # CDK app entry point
 lib/
-  application/        # ApplicationStack and ApplicationStage
+  application/        # ApplicationStack, ApplicationStage
+  logging/            # LoggingStack
   pipeline/           # DeliveryPipelineStack
+    artifacts/        # ArtifactsKey, ArtifactsBucket constructs
   repository/         # RepositoryStack
 test/
   unit/               # Vitest unit tests
+    application/
+    logging/
+    pipeline/
+      artifacts/
+    repository/
 ```
 
 ## Tooling Configuration
@@ -154,15 +164,15 @@ Then retry the push.
 
 ### Findings addressed in code
 
-**`AwsSolutions-S1`** — Pipeline artifacts bucket missing server access logging. Fixed by creating a dedicated access logs bucket and passing it as `serverAccessLogsBucket` on a custom `artifactBucket` provided to `CodePipeline`. The CDK Pipelines-generated bucket does not support access logging configuration, so a custom bucket is required.
+**`AwsSolutions-S1`** — S3 buckets missing server access logging. A shared `LoggingStack` provisions a dedicated server access logs bucket. The pipeline artifacts bucket (`ArtifactsBucket`) and the application bucket (`ApplicationStack`) both send access logs to that shared bucket. Within the `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack` so that the cross-stack reference stays within the same stage boundary. The CDK Pipelines-generated artifact bucket does not support access logging configuration, which is why a custom `artifactBucket` is provided to `CodePipeline`.
 
 ### Findings suppressed
 
-Suppressions are applied at the stack level via `NagSuppressions.addStackSuppressions` in `DeliveryPipelineStack`.
+**`AwsSolutions-S1`** — Applied to the server access logs bucket itself in `LoggingStack`. An access logs bucket cannot send its own access logs to itself without a circular dependency, so this finding is suppressed with `NagSuppressions.addResourceSuppressions`.
 
-**`AwsSolutions-CB4`** — CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing). `CodeBuildOptions` does not expose an `encryptionKey` property, so there is no API surface to set a KMS key on these projects directly.
+**`AwsSolutions-CB4`** — Applied at the stack level in `DeliveryPipelineStack`. CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing). `CodeBuildOptions` does not expose an `encryptionKey` property, so there is no API surface to set a KMS key on these projects directly.
 
-**`AwsSolutions-IAM5`** — CDK Pipelines and CodePipeline generate IAM policies with wildcard actions (e.g. `s3:GetObject*`, `s3:List*`) and wildcard resources on the pipeline role, CodeBuild roles, and the CodeCommit action role. These policies are produced entirely by CDK internals and cannot be further constrained through the available construct APIs.
+**`AwsSolutions-IAM5`** — Applied at the stack level in `DeliveryPipelineStack`. CDK Pipelines and CodePipeline generate IAM policies with wildcard actions (e.g. `s3:GetObject*`, `s3:List*`) and wildcard resources on the pipeline role, CodeBuild roles, and the CodeCommit action role. These policies are produced entirely by CDK internals and cannot be further constrained through the available construct APIs.
 
 ## CDK Commands
 
