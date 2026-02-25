@@ -137,6 +137,7 @@ Authentication uses the AWS CLI CodeCommit credential helper. Add the following 
 ```ini
 [credential]
   helper = !aws codecommit credential-helper $@
+  UseHttpPath = true
 ```
 
 On macOS, also configure the CodeCommit URL to use only the AWS credential helper, preventing Keychain from intercepting or caching credentials:
