@@ -25,6 +25,7 @@ export class DeliveryPipelineStack extends cdk.Stack {
     });
 
     const artifactsKey = new kms.Key(this, 'ArtifactsKey', {
+      alias: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
       enableKeyRotation: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
