@@ -5,7 +5,7 @@ const noAiReferences: SyncRule = (parsed) => {
   const content = [body, footer, header].filter((s) => s !== null).join('\n');
 
   return [
-    !/claude|ai assistance/i.test(content),
+    !/claude(?!\.md)|ai assistance/i.test(content),
     'Commit message must not reference Claude, Claude Code, or AI assistance',
   ];
 };

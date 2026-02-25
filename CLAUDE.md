@@ -68,6 +68,18 @@ npx cdk deploy
 ## Git Conventions
 
 - Do not reference Claude, Claude Code, or AI assistance in commit messages
+- Use Conventional Commits prefixes:
+  - `build:` — changes to the build system or external dependencies
+  - `chore:` — project tooling, config, scripts
+  - `ci:` — CI/CD pipeline changes
+  - `docs:` — documentation only
+  - `feat:` — new user-facing feature
+  - `fix:` — bug fix
+  - `perf:` — performance improvement
+  - `refactor:` — code restructuring with no behavior change
+  - `revert:` — reverts a previous commit
+  - `style:` — formatting changes that do not affect behavior
+  - `test:` — adding or updating tests
 
 ## Workflow
 
