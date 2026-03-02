@@ -63,7 +63,8 @@ lib/
   application/        # ApplicationStack, ApplicationStage
   logging/            # LoggingStack
   pipeline/           # DeliveryPipelineStack
-    artifacts/        # ArtifactsKey, ArtifactsBucket constructs
+    artifacts/        # ArtifactsBucket construct
+    delivery-pipeline/ # DeliveryPipeline construct
   repository/         # RepositoryStack
 test/
   unit/               # Vitest unit tests
@@ -71,6 +72,7 @@ test/
     logging/
     pipeline/
       artifacts/
+      delivery-pipeline/
     repository/
 ```
 
