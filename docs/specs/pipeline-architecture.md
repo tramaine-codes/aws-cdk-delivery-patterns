@@ -20,7 +20,7 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 
 #### 2. Build (Synth) Stage
 - **Build Image**: CodeBuild Standard 7.0
-- **Runtime**: Node.js 24, npm 11.10.1
+- **Runtime**: Node.js 24, npm 11.11.0
 - **Commands**:
   - `npm ci`
   - `npm run build`

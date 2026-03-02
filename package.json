@@ -23,7 +23,7 @@
   },
   "engines": {
     "node": "24.14.0",
-    "npm": "11.10.1"
+    "npm": "11.11.0"
   },
   "homepage": "https://github.com/tramaine-codes/aws-cdk-delivery-patterns",
   "name": "aws-cdk-delivery-patterns",
@@ -49,6 +49,6 @@
   "version": "0.1.0",
   "volta": {
     "node": "24.14.0",
-    "npm": "11.10.1"
+    "npm": "11.11.0"
   }
 }
