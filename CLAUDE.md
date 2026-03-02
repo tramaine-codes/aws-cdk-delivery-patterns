@@ -11,7 +11,8 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
   - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
   - **`lib/logging/`** — `LoggingStack` (shared S3 server access logs bucket)
   - **`lib/pipeline/`** — `DeliveryPipelineStack`
-    - **`lib/pipeline/artifacts/`** — `ArtifactsKey` and `ArtifactsBucket` constructs
+    - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key managed internally)
+    - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct
   - **`lib/repository/`** — `RepositoryStack`
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use `aws-cdk-lib/assertions` (`Template.fromStack`).
 

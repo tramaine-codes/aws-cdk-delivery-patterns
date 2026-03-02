@@ -92,8 +92,11 @@ DeliveryPipelineStack
 
 ### Adding Environments
 ```typescript
-const prodStage = new ApplicationStage(this, 'Prod', { env });
-pipeline.addStage(prodStage);
+new DeliveryPipeline(this, 'Pipeline', {
+  artifactBucket,
+  repository,
+  stage: new ApplicationStage(this, 'Prod', { env }),
+});
 ```
 
 ### Adding Pre/Post Steps

@@ -25,10 +25,11 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
   - `LoggingStack` — Provisions a shared S3 server access logs bucket used by all pipeline-level resources
 
 - **`lib/pipeline/`**
-  - `DeliveryPipelineStack` — Provisions the CodePipeline with CDK Pipelines construct
+  - `DeliveryPipelineStack` — Owns `ArtifactsBucket` and `ApplicationStage`; delegates pipeline mechanics to `DeliveryPipeline`
   - **`lib/pipeline/artifacts/`**
-    - `ArtifactsKey` — KMS key for pipeline artifacts encryption
-    - `ArtifactsBucket` — S3 bucket for pipeline artifacts with KMS encryption and access logging
+    - `ArtifactsBucket` — S3 bucket for pipeline artifacts with KMS encryption and access logging (KMS key managed internally)
+  - **`lib/pipeline/delivery-pipeline/`**
+    - `DeliveryPipeline` — `CodePipeline` construct; accepts an artifact bucket, repository, and stage as props
 
 - **`lib/repository/`**
   - `RepositoryStack` — Provisions the CodeCommit repository
