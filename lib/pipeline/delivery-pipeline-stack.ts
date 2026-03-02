@@ -19,20 +19,22 @@ export class DeliveryPipelineStack extends cdk.Stack {
       ...props,
     });
 
+    const { env, repository, serverAccessLogsBucket } = props;
+
     const { bucket: artifactBucket } = new ArtifactsBucket(
       this,
       'ArtifactsBucket',
       {
-        serverAccessLogsBucket: props.serverAccessLogsBucket,
+        serverAccessLogsBucket,
       }
     );
     const stage = new ApplicationStage(this, 'Dev', {
-      env: props.env,
+      env,
     });
 
     new DeliveryPipeline(this, 'Pipeline', {
       artifactBucket,
-      repository: props.repository,
+      repository,
       stage,
     });
 
