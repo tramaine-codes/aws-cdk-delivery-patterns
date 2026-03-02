@@ -3,7 +3,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import type { Construct } from 'constructs';
 
 export class RepositoryStack extends cdk.Stack {
-  readonly repository: codecommit.Repository;
+  readonly repository: codecommit.IRepository;
 
   constructor(scope: Construct, id: string, props: cdk.StackProps) {
     super(scope, id, {
