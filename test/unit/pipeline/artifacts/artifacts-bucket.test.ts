@@ -1,5 +1,4 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
-import * as kms from 'aws-cdk-lib/aws-kms';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, test } from 'vitest';
@@ -8,13 +7,30 @@ import { ArtifactsBucket } from '../../../../lib/pipeline/artifacts/artifacts-bu
 describe('ArtifactsBucket', () => {
   const app = new cdk.App();
   const stack = new cdk.Stack(app, 'TestStack');
-  const artifactsKey = new kms.Key(stack, 'TestKey');
   const serverAccessLogsBucket = new s3.Bucket(stack, 'TestLogsBucket');
   new ArtifactsBucket(stack, 'ArtifactsBucket', {
-    artifactsKey,
     serverAccessLogsBucket,
   });
   const template = Template.fromStack(stack);
+
+  test('creates a KMS key with an alias for pipeline artifacts', () => {
+    template.hasResourceProperties('AWS::KMS::Alias', {
+      AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
+    });
+  });
+
+  test('enables key rotation', () => {
+    template.hasResourceProperties('AWS::KMS::Key', {
+      EnableKeyRotation: true,
+    });
+  });
+
+  test('schedules the key for deletion on stack removal', () => {
+    template.hasResource('AWS::KMS::Key', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete',
+    });
+  });
 
   test('uses KMS encryption and deletes the bucket on stack removal', () => {
     template.hasResource('AWS::S3::Bucket', {

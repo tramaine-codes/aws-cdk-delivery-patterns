@@ -1,11 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import type * as kms from 'aws-cdk-lib/aws-kms';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 interface ArtifactsBucketProps {
-  readonly artifactsKey: kms.IKey;
   readonly serverAccessLogsBucket: s3.IBucket;
 }
 
@@ -15,11 +14,17 @@ export class ArtifactsBucket extends Construct {
   constructor(scope: Construct, id: string, props: ArtifactsBucketProps) {
     super(scope, id);
 
+    const key = new kms.Key(this, 'Key', {
+      alias: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
+      enableKeyRotation: true,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     this.bucket = new s3.Bucket(this, 'Resource', {
       autoDeleteObjects: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.KMS,
-      encryptionKey: props.artifactsKey,
+      encryptionKey: key,
       enforceSSL: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       serverAccessLogsBucket: props.serverAccessLogsBucket,
@@ -30,8 +35,7 @@ export class ArtifactsBucket extends Construct {
         actions: ['s3:PutObject'],
         conditions: {
           StringNotEqualsIfExists: {
-            's3:x-amz-server-side-encryption-aws-kms-key-id':
-              props.artifactsKey.keyArn,
+            's3:x-amz-server-side-encryption-aws-kms-key-id': key.keyArn,
           },
         },
         effect: iam.Effect.DENY,

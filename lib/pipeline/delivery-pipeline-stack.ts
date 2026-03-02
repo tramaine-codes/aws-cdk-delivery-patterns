@@ -11,7 +11,6 @@ import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { ApplicationStage } from '../application/application-stage.js';
 import { ArtifactsBucket } from './artifacts/artifacts-bucket.js';
-import { ArtifactsKey } from './artifacts/artifacts-key.js';
 
 interface DeliveryPipelineStackProps extends cdk.StackProps {
   readonly repository: codecommit.IRepository;
@@ -25,12 +24,10 @@ export class DeliveryPipelineStack extends cdk.Stack {
       ...props,
     });
 
-    const { key: artifactsKey } = new ArtifactsKey(this, 'ArtifactsKey');
     const { bucket: artifactBucket } = new ArtifactsBucket(
       this,
       'ArtifactsBucket',
       {
-        artifactsKey,
         serverAccessLogsBucket: props.serverAccessLogsBucket,
       }
     );
