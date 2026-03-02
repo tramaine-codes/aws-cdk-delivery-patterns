@@ -1,21 +1,20 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, expect, test } from 'vitest';
-import { LoggingStack } from '../../../lib/logging/logging-stack.js';
-import { DeliveryPipelineStack } from '../../../lib/pipeline/delivery-pipeline-stack.js';
-import { RepositoryStack } from '../../../lib/repository/repository-stack.js';
+import { ApplicationStage } from '../../../../lib/application/application-stage.js';
+import { DeliveryPipeline } from '../../../../lib/pipeline/delivery-pipeline/delivery-pipeline.js';
+import { RepositoryStack } from '../../../../lib/repository/repository-stack.js';
 
-describe('DeliveryPipelineStack', () => {
+describe('DeliveryPipeline', () => {
   const app = new cdk.App();
-  const { serverAccessLogsBucket } = new LoggingStack(
-    app,
-    'TestLoggingStack',
-    {}
-  );
   const { repository } = new RepositoryStack(app, 'TestRepositoryStack', {});
-  const stack = new DeliveryPipelineStack(app, 'TestPipelineStack', {
+  const stack = new cdk.Stack(app, 'TestStack');
+  const artifactBucket = new s3.Bucket(stack, 'TestArtifactBucket');
+  new DeliveryPipeline(stack, 'Pipeline', {
+    artifactBucket,
     repository,
-    serverAccessLogsBucket,
+    stage: new ApplicationStage(stack, 'Dev', {}),
   });
   const template = Template.fromStack(stack);
 

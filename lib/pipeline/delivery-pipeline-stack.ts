@@ -1,16 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
-import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import type * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import type * as s3 from 'aws-cdk-lib/aws-s3';
-import {
-  CodePipeline,
-  CodePipelineSource,
-  ShellStep,
-} from 'aws-cdk-lib/pipelines';
 import { NagSuppressions } from 'cdk-nag';
 import type { Construct } from 'constructs';
 import { ApplicationStage } from '../application/application-stage.js';
 import { ArtifactsBucket } from './artifacts/artifacts-bucket.js';
+import { DeliveryPipeline } from './delivery-pipeline/delivery-pipeline.js';
 
 interface DeliveryPipelineStackProps extends cdk.StackProps {
   readonly repository: codecommit.IRepository;
@@ -31,54 +26,15 @@ export class DeliveryPipelineStack extends cdk.Stack {
         serverAccessLogsBucket: props.serverAccessLogsBucket,
       }
     );
-
-    const pipeline = new CodePipeline(this, 'Pipeline', {
-      artifactBucket,
-      pipelineName: 'AwsCdkDeliveryPatternsPipeline',
-      selfMutation: true,
-      selfMutationCodeBuildDefaults: {
-        buildEnvironment: {
-          buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
-        },
-        partialBuildSpec: codebuild.BuildSpec.fromObject({
-          version: 0.2,
-          phases: {
-            install: {
-              'runtime-versions': {
-                nodejs: 24,
-              },
-              commands: ['npm install -g npm@11.10.1'],
-            },
-          },
-        }),
-      },
-      synth: new ShellStep('Synth', {
-        input: CodePipelineSource.codeCommit(props.repository, 'main'),
-        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
-      }),
-      synthCodeBuildDefaults: {
-        buildEnvironment: {
-          buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
-        },
-        partialBuildSpec: codebuild.BuildSpec.fromObject({
-          version: 0.2,
-          phases: {
-            install: {
-              'runtime-versions': {
-                nodejs: 24,
-              },
-              commands: ['npm install -g npm@11.10.1'],
-            },
-          },
-        }),
-      },
-    });
-
     const stage = new ApplicationStage(this, 'Dev', {
       env: props.env,
     });
 
-    pipeline.addStage(stage);
+    new DeliveryPipeline(this, 'Pipeline', {
+      artifactBucket,
+      repository: props.repository,
+      stage,
+    });
 
     NagSuppressions.addStackSuppressions(this, [
       {
