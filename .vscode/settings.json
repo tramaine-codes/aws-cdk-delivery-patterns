@@ -10,6 +10,7 @@
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
   "editor.tabSize": 2,
+  "kiroAgent.configureMCP": "Disabled",
   "prettier.enable": false,
   "typescript.tsdk": "./node_modules/typescript/lib"
 }
