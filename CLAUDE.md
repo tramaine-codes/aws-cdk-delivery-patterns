@@ -10,6 +10,9 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
 - **`lib/`** — CDK constructs, organized by domain. Within each domain directory, stacks and stages live at the top level; other constructs live in named subdirectories that reflect their contents.
   - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
   - **`lib/logging/`** — `LoggingStack` (shared S3 server access logs bucket)
+  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints)
+    - **`lib/network/vpc/`** — `NetworkVpc` construct (VPC, subnets, DNS settings)
+    - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway endpoint, KMS and CloudWatch Logs interface endpoints, endpoint security group)
   - **`lib/pipeline/`** — `DeliveryPipelineStack`
     - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key managed internally)
     - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct

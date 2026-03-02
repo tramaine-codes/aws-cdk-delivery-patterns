@@ -24,11 +24,12 @@ npm install
 npx cdk bootstrap
 ```
 
-**3. Deploy the logging and repository stacks**
+**3. Deploy the foundational stacks**
 
-These stacks are independent and can be deployed in either order. The logging stack provisions the shared S3 server access logs bucket used by all pipeline-level resources. The repository stack provisions the CodeCommit repository.
+The network stack provisions the VPC, subnets, and VPC endpoints used by compute resources such as Lambda functions. Deploy it first, as it is foundational to all compute infrastructure. The logging and repository stacks are independent of one another and can be deployed in either order after the network stack.
 
 ```bash
+npx cdk deploy AwsCdkDeliveryPatternsNetworkStack
 npx cdk deploy AwsCdkDeliveryPatternsLoggingStack
 npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
 ```
@@ -62,6 +63,9 @@ bin/                  # CDK app entry point
 lib/
   application/        # ApplicationStack, ApplicationStage
   logging/            # LoggingStack
+  network/            # NetworkStack
+    vpc/              # NetworkVpc construct
+    vpc-endpoints/    # VpcEndpoints construct
   pipeline/           # DeliveryPipelineStack
     artifacts/        # ArtifactsBucket construct
     delivery-pipeline/ # DeliveryPipeline construct
@@ -70,6 +74,9 @@ test/
   unit/               # Vitest unit tests
     application/
     logging/
+    network/
+      vpc/
+      vpc-endpoints/
     pipeline/
       artifacts/
       delivery-pipeline/
@@ -172,6 +179,8 @@ Then retry the push.
 ### Findings suppressed
 
 **`AwsSolutions-S1`** — Applied to the server access logs bucket itself in `LoggingStack`. An access logs bucket cannot send its own access logs to itself without a circular dependency, so this finding is suppressed with `NagSuppressions.addResourceSuppressions`.
+
+**`AwsSolutions-VPC7`** — Applied to the VPC in `NetworkVpc`. VPC flow logs are disabled to reduce cost. Enable if compliance or security monitoring requires VPC traffic analysis.
 
 **`AwsSolutions-CB4`** — Applied at the stack level in `DeliveryPipelineStack`. CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing). `CodeBuildOptions` does not expose an `encryptionKey` property, so there is no API surface to set a KMS key on these projects directly.
 
