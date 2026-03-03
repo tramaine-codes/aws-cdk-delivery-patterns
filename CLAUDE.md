@@ -87,4 +87,40 @@ npx cdk deploy
 
 ## Workflow
 
-- After each code change, run `npm run build` and `npm test` to verify nothing is broken
+- Keep changes small and focused. Avoid unrelated refactors.
+
+- Before implementing any non-trivial change, propose a short implementation plan (≤10 bullets) and wait for confirmation.
+
+- After each code change:
+  - Run `npm run build`
+  - Run `npm test`
+  - Fix all failures before proceeding.
+
+- After any infrastructure (CDK) change:
+  - Run `npx cdk synth`
+  - Before running a diff, describe the expected infrastructure changes:
+    - Resources added
+    - Resources modified
+    - Resources removed
+    - Any resource replacements
+  - Include an **Impact Summary**:
+    - Potential cost drivers (e.g., NAT Gateway, Interface VPC Endpoints, ALB/NLB, RDS, OpenSearch, KMS CMKs, CloudWatch Logs retention)
+    - Security-impacting changes (IAM policies, security groups, public access, encryption, logging)
+  - If the stack is currently deployed in any environment:
+    - Run `npx cdk diff`
+    - Confirm the actual diff matches the expected changes.
+  - If the stack is not deployed:
+    - Derive expected impact from the synthesized templates and summarize the changes.
+
+- Never deploy infrastructure without first describing the expected diff.
+
+- Prefer cost-minimizing defaults unless explicitly instructed otherwise.
+
+- Do not suppress `cdk-nag` findings unless:
+  - The issue cannot be resolved in code, and
+  - A clear, specific justification is provided.
+
+- Do not introduce new stacks, stages, or environments without explaining:
+  - Their purpose
+  - Their lifecycle
+  - Their rollback implications
