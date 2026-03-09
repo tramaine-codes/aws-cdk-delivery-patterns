@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib/core';
 import { describe, expect, test } from 'vitest';
 import { ApplicationStage } from '../../../../lib/application/application-stage.js';
 import { DeliveryPipeline } from '../../../../lib/pipeline/delivery-pipeline/delivery-pipeline.js';
+import { FoundationalStage } from '../../../../lib/pipeline/foundational-stage.js';
 import { RepositoryStack } from '../../../../lib/repository/repository-stack.js';
 
 describe('DeliveryPipeline', () => {
@@ -12,9 +13,10 @@ describe('DeliveryPipeline', () => {
   const stack = new cdk.Stack(app, 'TestStack');
   const artifactBucket = new s3.Bucket(stack, 'TestArtifactBucket');
   new DeliveryPipeline(stack, 'Pipeline', {
+    applicationStage: new ApplicationStage(stack, 'Dev', {}),
     artifactBucket,
+    foundationalStage: new FoundationalStage(stack, 'Foundational', {}),
     repository,
-    stage: new ApplicationStage(stack, 'Dev', {}),
   });
   const template = Template.fromStack(stack);
 

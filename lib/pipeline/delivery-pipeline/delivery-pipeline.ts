@@ -10,16 +10,18 @@ import {
 import { Construct } from 'constructs';
 
 interface DeliveryPipelineProps {
+  readonly applicationStage: cdk.Stage;
   readonly artifactBucket: s3.IBucket;
+  readonly foundationalStage: cdk.Stage;
   readonly repository: codecommit.IRepository;
-  readonly stage: cdk.Stage;
 }
 
 export class DeliveryPipeline extends Construct {
   constructor(scope: Construct, id: string, props: DeliveryPipelineProps) {
     super(scope, id);
 
-    const { artifactBucket, repository, stage } = props;
+    const { applicationStage, artifactBucket, foundationalStage, repository } =
+      props;
 
     const pipeline = new CodePipeline(this, 'Resource', {
       artifactBucket,
@@ -63,6 +65,7 @@ export class DeliveryPipeline extends Construct {
       },
     });
 
-    pipeline.addStage(stage);
+    pipeline.addStage(foundationalStage);
+    pipeline.addStage(applicationStage);
   }
 }

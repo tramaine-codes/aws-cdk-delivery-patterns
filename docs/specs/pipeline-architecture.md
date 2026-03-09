@@ -30,7 +30,12 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 - Updates pipeline if pipeline code changed
 - Pipeline restarts automatically after mutation
 
-#### 4. Application Deployment Stage (Dev)
+#### 4. Foundational Deployment Stage
+- Deploys `FoundationalStage`:
+  - `LoggingStack` (shared server access logs bucket)
+  - `NetworkStack` (VPC, subnets, VPC endpoints)
+
+#### 5. Application Deployment Stage (Dev)
 - Deploys `ApplicationStage`:
   - `LoggingStack` (stage-local)
   - `ApplicationStack`
@@ -40,7 +45,7 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 #### Artifacts Bucket
 - **Encryption**: KMS customer-managed key
 - **Key Rotation**: Enabled
-- **Access Logging**: To shared server access logs bucket
+- **Access Logging**: To an internal logging bucket managed within `ArtifactsBucket`
 - **Public Access**: Blocked
 - **SSL**: Enforced
 
@@ -51,30 +56,28 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 ### Cross-Stack Dependencies
 
 ```
-LoggingStack (shared) ──┐
-                        ├──> DeliveryPipelineStack
-RepositoryStack ────────┘
-
-DeliveryPipelineStack
-  └──> ApplicationStage
-         ├──> LoggingStack (stage-local)
-         └──> ApplicationStack
+RepositoryStack ────> DeliveryPipelineStack
+                        ├──> FoundationalStage
+                        │      ├──> LoggingStack (shared)
+                        │      └──> NetworkStack
+                        └──> ApplicationStage
+                               ├──> LoggingStack (stage-local)
+                               └──> ApplicationStack
 ```
 
 ## Deployment Process
 
-### Initial Setup
-1. Deploy `LoggingStack`
-2. Deploy `RepositoryStack`
-3. Configure CodeCommit remote
-4. Deploy `DeliveryPipelineStack`
-5. Push to CodeCommit main
+### Initial Setup (One-Time Manual Steps)
+1. Deploy `RepositoryStack`
+2. Configure CodeCommit remote
+3. Deploy `DeliveryPipelineStack`
+4. Push to CodeCommit main — pipeline takes over from here
 
 ### Subsequent Updates
 1. Make code changes
 2. Commit (Conventional Commits)
 3. Push to CodeCommit
-4. Pipeline auto-deploys
+4. Pipeline auto-deploys (including `FoundationalStage` and `ApplicationStage`)
 
 ## Environment Configuration
 
@@ -93,9 +96,10 @@ DeliveryPipelineStack
 ### Adding Environments
 ```typescript
 new DeliveryPipeline(this, 'Pipeline', {
+  applicationStage: new ApplicationStage(this, 'Prod', { env }),
   artifactBucket,
+  foundationalStage,
   repository,
-  stage: new ApplicationStage(this, 'Prod', { env }),
 });
 ```
 

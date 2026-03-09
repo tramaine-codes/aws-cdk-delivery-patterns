@@ -24,14 +24,13 @@ npm install
 npx cdk bootstrap
 ```
 
-**3. Deploy the foundational stacks**
+**3. Deploy the bootstrap stacks**
 
-The network stack provisions the VPC, subnets, and VPC endpoints used by compute resources such as Lambda functions. Deploy it first, as it is foundational to all compute infrastructure. The logging and repository stacks are independent of one another and can be deployed in either order after the network stack.
+The repository stack provisions the CodeCommit repository that the pipeline sources from. It must exist before the pipeline can be created. The pipeline stack manages all other infrastructure (networking, logging, application) via CI/CD after its initial deployment.
 
 ```bash
-npx cdk deploy AwsCdkDeliveryPatternsNetworkStack
-npx cdk deploy AwsCdkDeliveryPatternsLoggingStack
 npx cdk deploy AwsCdkDeliveryPatternsRepositoryStack
+npx cdk deploy AwsCdkDeliveryPatternsPipelineStack
 ```
 
 **4. Configure the CodeCommit remote**
@@ -42,15 +41,7 @@ See [CodeCommit Setup](#codecommit-setup) for credential helper configuration, t
 git remote add codecommit https://git-codecommit.us-east-1.amazonaws.com/v1/repos/aws-cdk-delivery-patterns
 ```
 
-**5. Deploy the pipeline stack**
-
-The pipeline stack depends on both the logging and repository stacks, so those must be deployed first.
-
-```bash
-npx cdk deploy AwsCdkDeliveryPatternsPipelineStack
-```
-
-**6. Push to CodeCommit to trigger the pipeline**
+**5. Push to CodeCommit to trigger the pipeline**
 
 ```bash
 git push codecommit main
@@ -174,11 +165,11 @@ Then retry the push.
 
 ### Findings addressed in code
 
-**`AwsSolutions-S1`** — S3 buckets missing server access logging. A shared `LoggingStack` provisions a dedicated server access logs bucket. The pipeline artifacts bucket (`ArtifactsBucket`) and the application bucket (`ApplicationStack`) both send access logs to that shared bucket. Within the `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack` so that the cross-stack reference stays within the same stage boundary. The CDK Pipelines-generated artifact bucket does not support access logging configuration, which is why a custom `artifactBucket` is provided to `CodePipeline`.
+**`AwsSolutions-S1`** — S3 buckets missing server access logging. `ArtifactsBucket` provisions its own internal logging bucket. Within the `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack`, and the application bucket sends access logs to that bucket. The CDK Pipelines-generated artifact bucket does not support access logging configuration, which is why a custom `artifactBucket` is provided to `CodePipeline`.
 
 ### Findings suppressed
 
-**`AwsSolutions-S1`** — Applied to the server access logs bucket itself in `LoggingStack`. An access logs bucket cannot send its own access logs to itself without a circular dependency, so this finding is suppressed with `NagSuppressions.addResourceSuppressions`.
+**`AwsSolutions-S1`** — Applied to the server access logs bucket in `LoggingStack` and to the internal logging bucket in `ArtifactsBucket`. An access logs bucket cannot send its own access logs to itself without a circular dependency, so this finding is suppressed with `NagSuppressions.addResourceSuppressions`.
 
 **`AwsSolutions-VPC7`** — Applied to the VPC in `NetworkVpc`. VPC flow logs are disabled to reduce cost. Enable if compliance or security monitoring requires VPC traffic analysis.
 

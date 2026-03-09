@@ -48,7 +48,8 @@ Security controls and compliance checks enforced through cdk-nag `AwsSolutionsCh
 - `AwsSolutions-IAM5`: Wildcard IAM (DeliveryPipelineStack)
 
 ### Resource-Level
-- `AwsSolutions-S1`: Server access logs bucket (LoggingStack)
+- `AwsSolutions-S1`: Server access logs bucket in `LoggingStack`
+- `AwsSolutions-S1`: Internal logging bucket within `ArtifactsBucket`
 
 ## Compliance Verification
 

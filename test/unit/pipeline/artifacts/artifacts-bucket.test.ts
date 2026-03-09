@@ -1,5 +1,4 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
-import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, test } from 'vitest';
 import { ArtifactsBucket } from '../../../../lib/pipeline/artifacts/artifacts-bucket.js';
@@ -7,10 +6,7 @@ import { ArtifactsBucket } from '../../../../lib/pipeline/artifacts/artifacts-bu
 describe('ArtifactsBucket', () => {
   const app = new cdk.App();
   const stack = new cdk.Stack(app, 'TestStack');
-  const serverAccessLogsBucket = new s3.Bucket(stack, 'TestLogsBucket');
-  new ArtifactsBucket(stack, 'ArtifactsBucket', {
-    serverAccessLogsBucket,
-  });
+  new ArtifactsBucket(stack, 'ArtifactsBucket');
   const template = Template.fromStack(stack);
 
   test('creates a KMS key with an alias for pipeline artifacts', () => {
@@ -70,7 +66,7 @@ describe('ArtifactsBucket', () => {
     });
   });
 
-  test('sends access logs to the server access logs bucket', () => {
+  test('sends access logs to an internal logging bucket', () => {
     template.hasResourceProperties('AWS::S3::Bucket', {
       BucketEncryption: Match.objectLike({
         ServerSideEncryptionConfiguration: Match.arrayWith([

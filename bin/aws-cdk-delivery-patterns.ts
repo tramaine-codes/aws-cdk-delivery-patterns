@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
 import { AwsSolutionsChecks } from 'cdk-nag';
-import { LoggingStack } from '../lib/logging/logging-stack.js';
-import { NetworkStack } from '../lib/network/network-stack.js';
 import { DeliveryPipelineStack } from '../lib/pipeline/delivery-pipeline-stack.js';
 import { RepositoryStack } from '../lib/repository/repository-stack.js';
 
@@ -14,24 +12,13 @@ const env = {
   region: 'us-east-1',
 };
 
-new NetworkStack(app, 'AwsCdkDeliveryPatternsNetworkStack', {
-  env,
-});
-
 const { repository } = new RepositoryStack(
   app,
   'AwsCdkDeliveryPatternsRepositoryStack',
   { env }
 );
 
-const { serverAccessLogsBucket } = new LoggingStack(
-  app,
-  'AwsCdkDeliveryPatternsLoggingStack',
-  { env }
-);
-
 new DeliveryPipelineStack(app, 'AwsCdkDeliveryPatternsPipelineStack', {
   env,
   repository,
-  serverAccessLogsBucket,
 });

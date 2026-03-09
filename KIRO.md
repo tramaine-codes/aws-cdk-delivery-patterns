@@ -22,23 +22,28 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
   - `ApplicationStage` — CDK Stage that deploys both `LoggingStack` and `ApplicationStack` together to maintain cross-stack references within the same stage boundary
 
 - **`lib/logging/`**
-  - `LoggingStack` — Provisions a shared S3 server access logs bucket used by all pipeline-level resources
+  - `LoggingStack` — Provisions a shared S3 server access logs bucket
+
+- **`lib/network/`**
+  - `NetworkStack` — Provisions the VPC, subnets, and VPC endpoints
 
 - **`lib/pipeline/`**
-  - `DeliveryPipelineStack` — Owns `ArtifactsBucket` and `ApplicationStage`; delegates pipeline mechanics to `DeliveryPipeline`
+  - `DeliveryPipelineStack` — Owns `ArtifactsBucket`, `FoundationalStage`, and `ApplicationStage`; delegates pipeline mechanics to `DeliveryPipeline`
+  - `FoundationalStage` — CDK Stage that deploys `LoggingStack` and `NetworkStack` as pipeline-managed foundational infrastructure
   - **`lib/pipeline/artifacts/`**
-    - `ArtifactsBucket` — S3 bucket for pipeline artifacts with KMS encryption and access logging (KMS key managed internally)
+    - `ArtifactsBucket` — S3 bucket for pipeline artifacts with KMS encryption and an internally managed logging bucket (KMS key and logging bucket both managed internally)
   - **`lib/pipeline/delivery-pipeline/`**
-    - `DeliveryPipeline` — `CodePipeline` construct; accepts an artifact bucket, repository, and stage as props
+    - `DeliveryPipeline` — `CodePipeline` construct; accepts an artifact bucket, repository, foundational stage, and application stage as props
 
 - **`lib/repository/`**
   - `RepositoryStack` — Provisions the CodeCommit repository
 
 ### Stack Dependencies
 
-1. `LoggingStack` and `RepositoryStack` are independent and can be deployed in either order
-2. `DeliveryPipelineStack` depends on both `LoggingStack` and `RepositoryStack`
-3. Within the pipeline, `ApplicationStage` deploys its own `LoggingStack` instance alongside `ApplicationStack`
+1. `RepositoryStack` is the only true bootstrap dependency — it must be deployed manually before the pipeline can be created (the pipeline sources from CodeCommit)
+2. `DeliveryPipelineStack` depends only on `RepositoryStack`
+3. The pipeline manages `FoundationalStage` (`LoggingStack` + `NetworkStack`) and `ApplicationStage` via CI/CD after initial setup
+4. Within `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack` to keep cross-stack references within stage boundaries
 
 ### Testing
 
@@ -121,7 +126,7 @@ npx cdk deploy
 ### Security Best Practices
 
 - **S3 buckets**: Always configure `blockPublicAccess`, `enforceSSL`, and encryption
-- **Server access logging**: All S3 buckets (except the logs bucket itself) must send access logs to the shared `serverAccessLogsBucket`
+- **Server access logging**: All S3 buckets (except logging buckets themselves) must send access logs to a dedicated logging bucket
 - **KMS encryption**: Use KMS encryption for sensitive data (pipeline artifacts)
 - **Key rotation**: Enable `enableKeyRotation` on all KMS keys
 - **Bucket policies**: Add explicit deny policies for unencrypted uploads when using KMS
@@ -156,14 +161,13 @@ npx cdk deploy
 ### Addressed in Code
 
 **`AwsSolutions-S1`** — S3 buckets missing server access logging
-- A shared `LoggingStack` provisions a dedicated server access logs bucket
-- The pipeline artifacts bucket (`ArtifactsBucket`) and application bucket (`ApplicationStack`) both send access logs to that shared bucket
-- Within `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack` to keep cross-stack references within the same stage boundary
+- `ArtifactsBucket` provisions its own internal logging bucket (self-contained within the construct)
+- Within `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack`, and the application bucket sends access logs to that bucket
 
 ### Suppressed Findings
 
-**`AwsSolutions-S1`** — Applied to the server access logs bucket itself in `LoggingStack`
-- An access logs bucket cannot send its own access logs to itself without a circular dependency
+**`AwsSolutions-S1`** — Applied to server access logs buckets in `LoggingStack` and within `ArtifactsBucket`
+- A logging bucket cannot send its own access logs to itself without a circular dependency
 
 **`AwsSolutions-CB4`** — Applied at the stack level in `DeliveryPipelineStack`
 - CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing)
@@ -190,7 +194,7 @@ Before committing:
 
 1. Create the stack file in the appropriate domain directory under `lib/`
 2. Create a corresponding test file under `test/unit/` mirroring the structure
-3. Instantiate the stack in `bin/aws-cdk-delivery-patterns.ts`
+3. If the stack should be pipeline-managed, add it to `FoundationalStage` or a new stage; otherwise instantiate it in `bin/aws-cdk-delivery-patterns.ts`
 4. If the stack requires resources from other stacks, pass them via props
 5. Add a `description` to the stack props
 6. Run `npm run build:ci` to verify
@@ -215,10 +219,10 @@ Before committing:
 
 This project demonstrates:
 - Self-mutating CDK Pipelines with CodeCommit source
-- Shared logging infrastructure pattern
-- Stage-local resource provisioning to maintain cross-stack references
+- Pipeline-managed foundational infrastructure (networking, logging) via `FoundationalStage`
+- Stage-local resource provisioning to maintain cross-stack references within stage boundaries
 - Security best practices with cdk-nag enforcement
-- Custom pipeline artifacts bucket with KMS encryption
+- Custom pipeline artifacts bucket with KMS encryption and self-contained logging
 - Multi-environment deployment patterns (currently Dev stage)
 
 The pipeline is triggered by pushing to the `main` branch of the CodeCommit repository.

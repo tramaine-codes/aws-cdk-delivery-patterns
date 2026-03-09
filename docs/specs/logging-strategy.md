@@ -2,56 +2,58 @@
 
 ## Overview
 
-Centralized S3 server access logging strategy that addresses cdk-nag `AwsSolutions-S1` while avoiding circular dependencies.
+S3 server access logging strategy that addresses cdk-nag `AwsSolutions-S1` while avoiding circular dependencies and cross-stage reference complexity.
 
 ## Architecture Pattern
 
-### Two-Tier Logging Model
+### Logging Model
 
-#### Tier 1: Shared Logging Stack (Pipeline-Level)
-- **Purpose**: Server access logs bucket for pipeline resources
-- **Scope**: CDK app root (outside stages)
-- **Deployed**: Once per account/region
-- **Consumers**: Pipeline artifacts bucket
+#### Pipeline Artifacts Bucket (Self-Contained)
+- **Purpose**: Access logging for pipeline artifact storage
+- **Scope**: Within the `ArtifactsBucket` construct
+- **Implementation**: Internal logging bucket provisioned directly inside `ArtifactsBucket`
+- **Rationale**: Eliminates cross-stack dependency between `LoggingStack` and `DeliveryPipelineStack`, enabling `LoggingStack` to be pipeline-managed
 
-#### Tier 2: Stage-Local Logging Stack (Application-Level)
+#### Foundational Logging Stack (Pipeline-Level)
+- **Purpose**: Shared server access logs bucket for foundational and future pipeline-level resources
+- **Scope**: Within `FoundationalStage` (pipeline-managed)
+- **Deployed**: Once per account/region via the pipeline
+- **Instantiation**: `lib/pipeline/foundational-stage.ts`
+
+#### Stage-Local Logging Stack (Application-Level)
 - **Purpose**: Server access logs bucket for application resources
 - **Scope**: Within `ApplicationStage`
 - **Deployed**: Once per stage (Dev, Prod, etc.)
-- **Consumers**: Application bucket
+- **Consumers**: `ApplicationStack`
+- **Instantiation**: `lib/application/application-stage.ts`
 
 ## Design Rationale
 
-### Why Two Logging Stacks?
+### Why Self-Contained Logging in ArtifactsBucket?
 
-**Problem**: CDK Pipelines stages are isolated. Cross-stack references between root app and stages create deployment complexity.
+**Problem**: A cross-stack reference from `LoggingStack` to `DeliveryPipelineStack` created a bootstrap dependency — `LoggingStack` had to be manually deployed before the pipeline could be created. This prevented `LoggingStack` from being pipeline-managed.
 
-**Solution**: Deploy stage-local `LoggingStack` within each `ApplicationStage` to keep cross-stack references within stage boundaries.
+**Solution**: `ArtifactsBucket` provisions its own internal logging bucket. The construct is fully self-contained with no external logging dependency.
+
+### Why Stage-Local LoggingStack in ApplicationStage?
+
+**Problem**: CDK Pipelines stages are isolated. Cross-stack references between the root app (or `FoundationalStage`) and `ApplicationStage` create deployment complexity.
+
+**Solution**: Deploy a stage-local `LoggingStack` within each `ApplicationStage` to keep cross-stack references within stage boundaries.
 
 ### Benefits
-1. **Isolation**: Each stage has own logging infrastructure
-2. **Simplicity**: No cross-stage dependencies
-3. **Compliance**: Satisfies cdk-nag `AwsSolutions-S1`
-4. **Scalability**: Easy to add stages
-
-## Implementation
-
-### Shared LoggingStack
-- **Location**: `lib/logging/logging-stack.ts`
-- **Instantiation**: `bin/aws-cdk-delivery-patterns.ts`
-- **Consumers**: `DeliveryPipelineStack`
-
-### Stage-Local LoggingStack
-- **Location**: Same construct, different instance
-- **Instantiation**: `lib/application/application-stage.ts`
-- **Consumers**: `ApplicationStack`
+1. **Minimal manual bootstrap**: Only `RepositoryStack` and `DeliveryPipelineStack` require manual initial deployment
+2. **Pipeline-managed**: `LoggingStack` and `NetworkStack` are deployed and updated by the pipeline
+3. **Isolation**: Each application stage has its own logging infrastructure
+4. **Compliance**: Satisfies cdk-nag `AwsSolutions-S1`
+5. **Scalability**: Easy to add stages or new pipeline-level resources
 
 ## Logging Flow
 
-### Pipeline Level
+### Pipeline Artifacts
 ```
-Pipeline Artifacts Bucket
-  └──> Shared Server Access Logs Bucket
+ArtifactsBucket (KMS Encrypted)
+  └──> Internal Logging Bucket (within ArtifactsBucket construct, S3-managed)
 ```
 
 ### Application Level (Per Stage)
@@ -63,7 +65,7 @@ Application Bucket (Dev)
 ## Security Controls
 
 ### Encryption
-- **Algorithm**: AES256 (S3-managed)
+- **Algorithm**: AES256 (S3-managed) for all logging buckets
 - **Rationale**: Logs don't contain sensitive data
 
 ### Access Control
@@ -80,7 +82,7 @@ Application Bucket (Dev)
 ### cdk-nag AwsSolutions-S1
 - **Requirement**: S3 buckets should have access logging
 - **Status**: ✅ Compliant
-- **Suppression**: Server access logs buckets (cannot log to themselves)
+- **Suppression**: Logging buckets themselves (cannot log to themselves)
 
 ## Extensibility
 
@@ -91,10 +93,8 @@ const prodStage = new ApplicationStage(this, 'Prod', { env });
 // Includes own LoggingStack instance
 ```
 
-### Adding New Buckets
-1. Pass `serverAccessLogsBucket` via props
-2. Configure `serverAccessLogsBucket` on bucket
-3. Ensure same stack or cross-stack reference
+### Adding New Pipeline-Level Buckets
+Pass the `serverAccessLogsBucket` from `FoundationalStage`'s `LoggingStack` via stage props, or provision a self-contained internal logging bucket within the construct (as `ArtifactsBucket` does).
 
 ## Limitations
 

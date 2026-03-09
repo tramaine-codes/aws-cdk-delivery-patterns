@@ -13,8 +13,8 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
   - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints)
     - **`lib/network/vpc/`** — `NetworkVpc` construct (VPC, subnets, DNS settings)
     - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway endpoint, KMS and CloudWatch Logs interface endpoints, endpoint security group)
-  - **`lib/pipeline/`** — `DeliveryPipelineStack`
-    - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key managed internally)
+  - **`lib/pipeline/`** — `DeliveryPipelineStack` and `FoundationalStage`
+    - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key and logging bucket managed internally)
     - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct
   - **`lib/repository/`** — `RepositoryStack`
 - **`test/unit/`** — Vitest unit tests. CDK stack assertions use `aws-cdk-lib/assertions` (`Template.fromStack`).

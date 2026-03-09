@@ -26,11 +26,17 @@ test/unit/
 │   └── application-stage.test.ts
 ├── logging/
 │   └── logging-stack.test.ts
+├── network/
+│   ├── vpc/
+│   │   └── vpc.test.ts
+│   └── vpc-endpoints/
+│       └── vpc-endpoints.test.ts
 ├── pipeline/
-│   ├── delivery-pipeline-stack.test.ts
-│   └── artifacts/
-│       ├── artifacts-key.test.ts
-│       └── artifacts-bucket.test.ts
+│   ├── foundational-stage.test.ts
+│   ├── artifacts/
+│   │   └── artifacts-bucket.test.ts
+│   └── delivery-pipeline/
+│       └── delivery-pipeline.test.ts
 └── repository/
     └── repository-stack.test.ts
 ```
