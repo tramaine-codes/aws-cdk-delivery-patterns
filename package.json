@@ -3,7 +3,7 @@
     "aws-cdk-delivery-patterns": "bin/aws-cdk-delivery-patterns.js"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.241.0",
+    "aws-cdk-lib": "2.243.0",
     "constructs": "10.5.1"
   },
   "devDependencies": {
@@ -16,7 +16,7 @@
     "cdk-nag": "2.37.55",
     "del-cli": "7.0.0",
     "husky": "9.1.7",
-    "lint-staged": "16.3.2",
+    "lint-staged": "16.3.3",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
