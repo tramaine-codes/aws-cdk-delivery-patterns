@@ -19,6 +19,11 @@ const { repository } = new RepositoryStack(
 );
 
 new DeliveryPipelineStack(app, 'AwsCdkDeliveryPatternsPipelineStack', {
+  // Look up the bundle ID before deploying:
+  // aws workspaces describe-workspace-bundles --owner AMAZON \
+  //   --query 'Bundles[?BundleType==`WORKSPACES_POOLS`].{Name:Name,BundleId:BundleId}' \
+  //   --output table
+  bundleId: 'wsb-82dpmqfgh',
   env,
   repository,
 });

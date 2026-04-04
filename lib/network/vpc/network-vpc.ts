@@ -36,4 +36,8 @@ export class NetworkVpc extends Construct {
       },
     ]);
   }
+
+  get isolatedSubnets(): ReadonlyArray<ec2.ISubnet> {
+    return this.vpc.selectSubnets({ subnetGroupName: 'Isolated' }).subnets;
+  }
 }

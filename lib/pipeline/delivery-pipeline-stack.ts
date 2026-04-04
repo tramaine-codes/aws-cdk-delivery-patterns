@@ -8,6 +8,7 @@ import { DeliveryPipeline } from './delivery-pipeline/delivery-pipeline.js';
 import { FoundationalStage } from './foundational-stage.js';
 
 interface DeliveryPipelineStackProps extends cdk.StackProps {
+  readonly bundleId: string;
   readonly repository: codecommit.IRepository;
 }
 
@@ -18,7 +19,7 @@ export class DeliveryPipelineStack extends cdk.Stack {
       ...props,
     });
 
-    const { env, repository } = props;
+    const { bundleId, env, repository } = props;
 
     const { bucket: artifactBucket } = new ArtifactsBucket(
       this,
@@ -27,7 +28,10 @@ export class DeliveryPipelineStack extends cdk.Stack {
     const foundationalStage = new FoundationalStage(this, 'Foundational', {
       env,
     });
-    const applicationStage = new ApplicationStage(this, 'Dev', { env });
+    const applicationStage = new ApplicationStage(this, 'Dev', {
+      bundleId,
+      env,
+    });
 
     new DeliveryPipeline(this, 'Pipeline', {
       applicationStage,

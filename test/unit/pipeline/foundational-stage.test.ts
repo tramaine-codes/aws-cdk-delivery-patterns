@@ -24,4 +24,13 @@ describe('FoundationalStage', () => {
 
     template.resourceCountIs('AWS::EC2::VPC', 1);
   });
+
+  test('creates a directory stack', () => {
+    const stack = stage.node.findChild(
+      'AwsCdkDeliveryPatternsDirectoryStack'
+    ) as cdk.Stack;
+    const template = Template.fromStack(stack);
+
+    template.resourceCountIs('AWS::DirectoryService::MicrosoftAD', 1);
+  });
 });

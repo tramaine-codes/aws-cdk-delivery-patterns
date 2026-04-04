@@ -41,5 +41,11 @@ export class VpcEndpoints extends Construct {
       service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
       subnets: isolatedSubnets,
     });
+
+    vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+      securityGroups: [endpointSecurityGroup],
+      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+      subnets: isolatedSubnets,
+    });
   }
 }

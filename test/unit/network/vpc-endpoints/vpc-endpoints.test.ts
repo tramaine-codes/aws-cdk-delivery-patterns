@@ -49,6 +49,19 @@ describe('VpcEndpoints', () => {
     });
   });
 
+  test('creates a Secrets Manager interface endpoint in isolated subnets', () => {
+    template.hasResourceProperties('AWS::EC2::VPCEndpoint', {
+      PrivateDnsEnabled: true,
+      ServiceName: {
+        'Fn::Join': [
+          '',
+          ['com.amazonaws.', { Ref: 'AWS::Region' }, '.secretsmanager'],
+        ],
+      },
+      VpcEndpointType: 'Interface',
+    });
+  });
+
   test('creates an endpoint security group allowing HTTPS from the VPC CIDR', () => {
     template.hasResourceProperties('AWS::EC2::SecurityGroup', {
       SecurityGroupIngress: Match.arrayWith([
