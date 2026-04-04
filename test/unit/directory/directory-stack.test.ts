@@ -27,7 +27,7 @@ describe('DirectoryStack', () => {
 
   test('stores the directory ID in SSM', () => {
     template.hasResourceProperties('AWS::SSM::Parameter', {
-      Name: '/aws-cdk-delivery-patterns/directory-id',
+      Name: '/delivery-patterns/directory-id',
       Type: 'String',
     });
   });

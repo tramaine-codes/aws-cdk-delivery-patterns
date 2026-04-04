@@ -13,7 +13,7 @@ export class WorkspacesPool extends Construct {
     const { bundleId } = props;
     const directoryId = ssm.StringParameter.valueForStringParameter(
       this,
-      '/aws-cdk-delivery-patterns/directory-id'
+      '/delivery-patterns/directory-id'
     );
 
     new workspaces.CfnWorkspacesPool(this, 'Resource', {

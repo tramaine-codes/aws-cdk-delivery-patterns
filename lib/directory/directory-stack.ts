@@ -25,7 +25,7 @@ export class DirectoryStack extends cdk.Stack {
 
     new ssm.StringParameter(this, 'DirectoryIdParameter', {
       description: 'Directory ID for AWS Managed Microsoft AD',
-      parameterName: '/aws-cdk-delivery-patterns/directory-id',
+      parameterName: '/delivery-patterns/directory-id',
       stringValue: directoryId,
     });
   }
