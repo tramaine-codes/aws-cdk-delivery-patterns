@@ -47,5 +47,23 @@ export class VpcEndpoints extends Construct {
       service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
       subnets: isolatedSubnets,
     });
+
+    vpc.addInterfaceEndpoint('SsmEndpoint', {
+      securityGroups: [endpointSecurityGroup],
+      service: ec2.InterfaceVpcEndpointAwsService.SSM,
+      subnets: isolatedSubnets,
+    });
+
+    vpc.addInterfaceEndpoint('SsmMessagesEndpoint', {
+      securityGroups: [endpointSecurityGroup],
+      service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+      subnets: isolatedSubnets,
+    });
+
+    vpc.addInterfaceEndpoint('Ec2MessagesEndpoint', {
+      securityGroups: [endpointSecurityGroup],
+      service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+      subnets: isolatedSubnets,
+    });
   }
 }

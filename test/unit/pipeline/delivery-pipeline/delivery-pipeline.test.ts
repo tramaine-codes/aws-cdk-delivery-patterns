@@ -13,9 +13,7 @@ describe('DeliveryPipeline', () => {
   const stack = new cdk.Stack(app, 'TestStack');
   const artifactBucket = new s3.Bucket(stack, 'TestArtifactBucket');
   new DeliveryPipeline(stack, 'Pipeline', {
-    applicationStage: new ApplicationStage(stack, 'Dev', {
-      bundleId: 'wsb-test12345',
-    }),
+    applicationStage: new ApplicationStage(stack, 'Dev', {}),
     artifactBucket,
     foundationalStage: new FoundationalStage(stack, 'Foundational', {}),
     repository,

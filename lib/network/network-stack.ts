@@ -6,6 +6,7 @@ import { VpcEndpoints } from './vpc-endpoints/vpc-endpoints.js';
 
 export class NetworkStack extends cdk.Stack {
   readonly isolatedSubnets: ReadonlyArray<ec2.ISubnet>;
+  readonly privateSubnets: ReadonlyArray<ec2.ISubnet>;
   readonly vpc: ec2.IVpc;
 
   constructor(scope: Construct, id: string, props: cdk.StackProps) {
@@ -15,8 +16,12 @@ export class NetworkStack extends cdk.Stack {
       ...props,
     });
 
-    const { isolatedSubnets, vpc } = new NetworkVpc(this, 'Vpc');
+    const { isolatedSubnets, privateSubnets, vpc } = new NetworkVpc(
+      this,
+      'Vpc'
+    );
     this.isolatedSubnets = isolatedSubnets;
+    this.privateSubnets = privateSubnets;
     this.vpc = vpc;
 
     new VpcEndpoints(this, 'VpcEndpoints', { vpc });

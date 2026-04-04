@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
+import { DomainJoinedInstanceStack } from '../directory/domain-joined-instance-stack.js';
 import { DirectoryStack } from '../directory/directory-stack.js';
 import { LoggingStack } from '../logging/logging-stack.js';
 import { NetworkStack } from '../network/network-stack.js';
@@ -9,7 +10,7 @@ export class FoundationalStage extends cdk.Stage {
     super(scope, id, props);
 
     const { env } = props;
-    const { isolatedSubnets, vpc } = new NetworkStack(
+    const { isolatedSubnets, privateSubnets, vpc } = new NetworkStack(
       this,
       'AwsCdkDeliveryPatternsNetworkStack',
       { env }
@@ -24,5 +25,15 @@ export class FoundationalStage extends cdk.Stage {
       subnets: isolatedSubnets,
       vpc,
     });
+
+    new DomainJoinedInstanceStack(
+      this,
+      'AwsCdkDeliveryPatternsDomainJoinedInstanceStack',
+      {
+        env,
+        subnets: privateSubnets,
+        vpc,
+      }
+    );
   }
 }

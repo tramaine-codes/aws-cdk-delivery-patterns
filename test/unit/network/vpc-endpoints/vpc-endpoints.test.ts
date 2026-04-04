@@ -62,6 +62,42 @@ describe('VpcEndpoints', () => {
     });
   });
 
+  test('creates an SSM interface endpoint in isolated subnets', () => {
+    template.hasResourceProperties('AWS::EC2::VPCEndpoint', {
+      PrivateDnsEnabled: true,
+      ServiceName: {
+        'Fn::Join': ['', ['com.amazonaws.', { Ref: 'AWS::Region' }, '.ssm']],
+      },
+      VpcEndpointType: 'Interface',
+    });
+  });
+
+  test('creates an SSM Messages interface endpoint in isolated subnets', () => {
+    template.hasResourceProperties('AWS::EC2::VPCEndpoint', {
+      PrivateDnsEnabled: true,
+      ServiceName: {
+        'Fn::Join': [
+          '',
+          ['com.amazonaws.', { Ref: 'AWS::Region' }, '.ssmmessages'],
+        ],
+      },
+      VpcEndpointType: 'Interface',
+    });
+  });
+
+  test('creates an EC2 Messages interface endpoint in isolated subnets', () => {
+    template.hasResourceProperties('AWS::EC2::VPCEndpoint', {
+      PrivateDnsEnabled: true,
+      ServiceName: {
+        'Fn::Join': [
+          '',
+          ['com.amazonaws.', { Ref: 'AWS::Region' }, '.ec2messages'],
+        ],
+      },
+      VpcEndpointType: 'Interface',
+    });
+  });
+
   test('creates an endpoint security group allowing HTTPS from the VPC CIDR', () => {
     template.hasResourceProperties('AWS::EC2::SecurityGroup', {
       SecurityGroupIngress: Match.arrayWith([

@@ -8,16 +8,16 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
 
 - **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates stacks and passes them to `cdk.App`.
 - **`lib/`** — CDK constructs, organized by domain. Within each domain directory, stacks and stages live at the top level; other constructs live in named subdirectories that reflect their contents.
-  - **`lib/application/`** — `ApplicationStack`, `ApplicationStage`, and `WorkspacesStack`
-    - **`lib/application/workspaces/`** — `WorkspacesPool` construct (`CfnWorkspacesPool`, 1 desired session, application settings disabled, session timeouts configured)
-  - **`lib/directory/`** — `DirectoryStack` (AWS Managed Microsoft AD; writes directory ID to SSM at `/aws-cdk-delivery-patterns/directory-id`)
+  - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
+  - **`lib/directory/`** — `DirectoryStack` (AWS Managed Microsoft AD; writes directory ID to SSM at `/delivery-patterns/directory-id`) and `DomainJoinedInstanceStack` (Windows EC2 for AD authentication testing)
+    - **`lib/directory/domain-joined-instance/`** — `DomainJoinedInstance` construct (Windows Server 2022, SSM Session Manager access, domain-joined via SSM Association, encrypted EBS, AD protocol egress)
     - **`lib/directory/microsoft-ad/`** — `MicrosoftAd` construct (KMS-encrypted Secrets Manager admin password, `CfnMicrosoftAD` Standard edition, domain `corp.awscdkdelivery.internal`)
-    - **`lib/directory/security-group/`** — `DirectorySecurityGroup` construct (egress rules for all AD protocols; not currently instantiated — add when domain-joined EC2 instances are introduced)
+    - **`lib/directory/security-group/`** — `DirectorySecurityGroup` construct (egress rules for all AD protocols; used by `DomainJoinedInstance`)
   - **`lib/logging/`** — `LoggingStack` (shared S3 server access logs bucket)
-  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints); exposes `vpc` and `isolatedSubnets` for consumption by `DirectoryStack`
+  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints); exposes `vpc`, `isolatedSubnets`, and `privateSubnets` for consumption by `DirectoryStack` and `DomainJoinedInstanceStack`
     - **`lib/network/vpc/`** — `NetworkVpc` construct (VPC, subnets, DNS settings)
-    - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway endpoint; KMS, CloudWatch Logs, and Secrets Manager interface endpoints; endpoint security group)
-  - **`lib/pipeline/`** — `DeliveryPipelineStack` and `FoundationalStage`; `FoundationalStage` exposes `directoryId` for consumption by `ApplicationStage`
+    - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway endpoint; KMS, CloudWatch Logs, Secrets Manager, SSM, SSM Messages, and EC2 Messages interface endpoints; endpoint security group)
+  - **`lib/pipeline/`** — `DeliveryPipelineStack` and `FoundationalStage`
     - **`lib/pipeline/artifacts/`** — `ArtifactsBucket` construct (KMS key and logging bucket managed internally)
     - **`lib/pipeline/delivery-pipeline/`** — `DeliveryPipeline` construct
   - **`lib/repository/`** — `RepositoryStack`
