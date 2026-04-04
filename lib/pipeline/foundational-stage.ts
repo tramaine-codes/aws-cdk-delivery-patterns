@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
-import { DomainJoinedInstanceStack } from '../directory/domain-joined-instance-stack.js';
 import { DirectoryStack } from '../directory/directory-stack.js';
+import { DomainJoinedInstanceStack } from '../directory/domain-joined-instance-stack.js';
 import { LoggingStack } from '../logging/logging-stack.js';
 import { NetworkStack } from '../network/network-stack.js';
 
