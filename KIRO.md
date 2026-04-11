@@ -24,12 +24,23 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
 - **`lib/logging/`**
   - `LoggingStack` — Provisions a shared S3 server access logs bucket
 
+- **`lib/directory/`**
+  - `DirectoryStack` — Provisions AWS Managed Microsoft AD; writes directory ID to SSM at `/delivery-patterns/directory-id`
+  - **`lib/directory/microsoft-ad/`**
+    - `MicrosoftAd` — KMS-encrypted Secrets Manager admin password, `CfnMicrosoftAD` Standard edition, domain `corp.awscdkdelivery.internal`
+  - **`lib/directory/security-group/`**
+    - `DirectorySecurityGroup` — Egress rules for all AD protocols
+
 - **`lib/network/`**
-  - `NetworkStack` — Provisions the VPC, subnets, and VPC endpoints
+  - `NetworkStack` — Provisions the VPC, subnets, and VPC endpoints; exposes `vpc`, `isolatedSubnets`, and `privateSubnets` for consumption by `DirectoryStack`
+  - **`lib/network/vpc/`**
+    - `NetworkVpc` — VPC, subnets, DNS settings
+  - **`lib/network/vpc-endpoints/`**
+    - `VpcEndpoints` — S3 gateway endpoint; KMS, CloudWatch Logs, Secrets Manager, SSM, SSM Messages, and EC2 Messages interface endpoints; endpoint security group
 
 - **`lib/pipeline/`**
   - `DeliveryPipelineStack` — Owns `ArtifactsBucket`, `FoundationalStage`, and `ApplicationStage`; delegates pipeline mechanics to `DeliveryPipeline`
-  - `FoundationalStage` — CDK Stage that deploys `LoggingStack` and `NetworkStack` as pipeline-managed foundational infrastructure
+  - `FoundationalStage` — CDK Stage that deploys `LoggingStack`, `NetworkStack`, and `DirectoryStack` as pipeline-managed foundational infrastructure
   - **`lib/pipeline/artifacts/`**
     - `ArtifactsBucket` — S3 bucket for pipeline artifacts with KMS encryption and an internally managed logging bucket (KMS key and logging bucket both managed internally)
   - **`lib/pipeline/delivery-pipeline/`**
@@ -42,7 +53,7 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
 
 1. `RepositoryStack` is the only true bootstrap dependency — it must be deployed manually before the pipeline can be created (the pipeline sources from CodeCommit)
 2. `DeliveryPipelineStack` depends only on `RepositoryStack`
-3. The pipeline manages `FoundationalStage` (`LoggingStack` + `NetworkStack`) and `ApplicationStage` via CI/CD after initial setup
+3. The pipeline manages `FoundationalStage` (`LoggingStack` + `NetworkStack` + `DirectoryStack`) and `ApplicationStage` via CI/CD after initial setup
 4. Within `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack` to keep cross-stack references within stage boundaries
 
 ### Testing
@@ -66,6 +77,7 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
   - Runs automatically during `cdk synth` — synthesis fails on unaddressed violations
   - Use `NagSuppressions` to suppress findings that cannot be fixed in code; always include a `reason`
 - **Commit convention**: Conventional Commits enforced via commitlint + husky
+- **Dependency updates**: [npm-check-updates](https://github.com/raineorshine/npm-check-updates) with config in `.ncurc.cjs`. Targets latest versions for all packages except `@types/node`, which is pinned to minor updates only.
 - **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files)
 
 ## Commands

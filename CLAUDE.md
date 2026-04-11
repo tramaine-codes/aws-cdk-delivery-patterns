@@ -9,12 +9,11 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
 - **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point; instantiates stacks and passes them to `cdk.App`.
 - **`lib/`** — CDK constructs, organized by domain. Within each domain directory, stacks and stages live at the top level; other constructs live in named subdirectories that reflect their contents.
   - **`lib/application/`** — `ApplicationStack` and `ApplicationStage`
-  - **`lib/directory/`** — `DirectoryStack` (AWS Managed Microsoft AD; writes directory ID to SSM at `/delivery-patterns/directory-id`) and `DomainJoinedInstanceStack` (Windows EC2 for AD authentication testing)
-    - **`lib/directory/domain-joined-instance/`** — `DomainJoinedInstance` construct (Windows Server 2022, SSM Session Manager access, domain-joined via SSM Association, encrypted EBS, AD protocol egress)
+  - **`lib/directory/`** — `DirectoryStack` (AWS Managed Microsoft AD; writes directory ID to SSM at `/delivery-patterns/directory-id`)
     - **`lib/directory/microsoft-ad/`** — `MicrosoftAd` construct (KMS-encrypted Secrets Manager admin password, `CfnMicrosoftAD` Standard edition, domain `corp.awscdkdelivery.internal`)
-    - **`lib/directory/security-group/`** — `DirectorySecurityGroup` construct (egress rules for all AD protocols; used by `DomainJoinedInstance`)
+    - **`lib/directory/security-group/`** — `DirectorySecurityGroup` construct (egress rules for all AD protocols)
   - **`lib/logging/`** — `LoggingStack` (shared S3 server access logs bucket)
-  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints); exposes `vpc`, `isolatedSubnets`, and `privateSubnets` for consumption by `DirectoryStack` and `DomainJoinedInstanceStack`
+  - **`lib/network/`** — `NetworkStack` (VPC, subnets, VPC endpoints); exposes `vpc`, `isolatedSubnets`, and `privateSubnets` for consumption by `DirectoryStack`
     - **`lib/network/vpc/`** — `NetworkVpc` construct (VPC, subnets, DNS settings)
     - **`lib/network/vpc-endpoints/`** — `VpcEndpoints` construct (S3 gateway endpoint; KMS, CloudWatch Logs, Secrets Manager, SSM, SSM Messages, and EC2 Messages interface endpoints; endpoint security group)
   - **`lib/pipeline/`** — `DeliveryPipelineStack` and `FoundationalStage`
@@ -31,6 +30,7 @@ This is an AWS CDK TypeScript project. The CDK app is executed directly from Typ
 - **Test runner**: Vitest (not Jest). Config is in `vite.config.unit.ts`. Tests live in `test/unit/`.
 - **Security checks**: [cdk-nag](https://github.com/cdklabs/cdk-nag) with `AwsSolutionsChecks` applied in `bin/aws-cdk-delivery-patterns.ts`. Runs automatically during `cdk synth` — synthesis fails on unaddressed violations. Use `NagSuppressions` to suppress findings that cannot be fixed in code; always include a `reason`.
 - **Commit convention**: Conventional Commits enforced via commitlint + husky.
+- **Dependency updates**: [npm-check-updates](https://github.com/raineorshine/npm-check-updates) with config in `.ncurc.cjs`. Targets latest versions for all packages except `@types/node`, which is pinned to minor updates only.
 - **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files).
 
 ## Commands

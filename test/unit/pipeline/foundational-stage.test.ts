@@ -33,13 +33,4 @@ describe('FoundationalStage', () => {
 
     template.resourceCountIs('AWS::DirectoryService::MicrosoftAD', 1);
   });
-
-  test('creates a domain-joined instance stack', () => {
-    const stack = stage.node.findChild(
-      'AwsCdkDeliveryPatternsDomainJoinedInstanceStack'
-    ) as cdk.Stack;
-    const template = Template.fromStack(stack);
-
-    template.resourceCountIs('AWS::EC2::Instance', 1);
-  });
 });
