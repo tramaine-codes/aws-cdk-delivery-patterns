@@ -3,11 +3,11 @@
     "aws-cdk-delivery-patterns": "bin/aws-cdk-delivery-patterns.js"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.248.0",
+    "aws-cdk-lib": "2.250.0",
     "constructs": "10.6.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.11",
+    "@biomejs/biome": "2.4.12",
     "@commitlint/cli": "20.5.0",
     "@commitlint/config-conventional": "20.5.0",
     "@types/node": "24.12.2",
