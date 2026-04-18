@@ -12,13 +12,13 @@
     "@commitlint/config-conventional": "20.5.0",
     "@types/node": "24.12.2",
     "@vitest/coverage-v8": "4.1.4",
-    "aws-cdk": "2.1118.0",
+    "aws-cdk": "2.1118.2",
     "cdk-nag": "2.37.55",
     "del-cli": "7.0.0",
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
     "tsx": "4.21.0",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.4"
   },
   "engines": {
