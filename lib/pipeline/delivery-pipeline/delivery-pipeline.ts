@@ -38,7 +38,7 @@ export class DeliveryPipeline extends Construct {
               'runtime-versions': {
                 nodejs: 24,
               },
-              commands: ['npm install -g npm@11.11.0'],
+              commands: ['npm install -g npm@11.13.0'],
             },
           },
         }),
@@ -58,7 +58,7 @@ export class DeliveryPipeline extends Construct {
               'runtime-versions': {
                 nodejs: 24,
               },
-              commands: ['npm install -g npm@11.11.0'],
+              commands: ['npm install -g npm@11.13.0'],
             },
           },
         }),
