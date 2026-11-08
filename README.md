@@ -18,7 +18,7 @@ An AWS CDK project written in TypeScript for exploring and implementing cloud de
 npm install
 ```
 
-**2. Bootstrap your AWS environment** *(first-time only)*
+**2. Bootstrap your AWS environment** _(first-time only)_
 
 ```bash
 npx cdk bootstrap
@@ -76,15 +76,15 @@ test/
 
 ## Tooling Configuration
 
-| File                     | Purpose                               |
-| ------------------------ | ------------------------------------- |
-| `biome.json`             | Biome linter/formatter configuration  |
-| `cdk.json`               | CDK toolkit configuration             |
-| `CLAUDE.md`              | Claude Code instructions              |
-| `commitlint.config.ts`   | Conventional Commits rules            |
-| `lint-staged.config.js`  | Staged file lint/format configuration |
-| `tsconfig.json`          | TypeScript configuration (noEmit)     |
-| `vite.config.unit.ts`    | Vitest configuration                  |
+| File                    | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| `biome.json`            | Biome linter/formatter configuration  |
+| `cdk.json`              | CDK toolkit configuration             |
+| `CLAUDE.md`             | Claude Code instructions              |
+| `commitlint.config.ts`  | Conventional Commits rules            |
+| `lint-staged.config.js` | Staged file lint/format configuration |
+| `tsconfig.json`         | TypeScript configuration (noEmit)     |
+| `vite.config.unit.ts`   | Vitest configuration                  |
 
 ## Development
 
@@ -201,15 +201,15 @@ The pre-commit hook runs `npm run build:ci` and `lint-staged` (Biome format + li
 
 ## Tooling
 
-| Tool                                                     | Purpose                                       |
-| -------------------------------------------------------- | --------------------------------------------- |
-| [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/)  | Infrastructure as code                        |
-| [TypeScript](https://www.typescriptlang.org/)            | Language (type-check only; runtime via `tsx`) |
-| [Vitest](https://vitest.dev/)                            | Unit test runner                              |
-| [Biome](https://biomejs.dev/)                            | Linter and formatter                          |
+| Tool                                                    | Purpose                                       |
+| ------------------------------------------------------- | --------------------------------------------- |
+| [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/) | Infrastructure as code                        |
+| [TypeScript](https://www.typescriptlang.org/)           | Language (type-check only; runtime via `tsx`) |
+| [Vitest](https://vitest.dev/)                           | Unit test runner                              |
+| [Biome](https://biomejs.dev/)                           | Linter and formatter                          |
 | [cdk-nag](https://github.com/cdklabs/cdk-nag)           | CDK security and compliance checks            |
-| [Husky](https://typicode.github.io/husky/)               | Git hooks                                     |
-| [commitlint](https://commitlint.js.org/)                 | Conventional Commits enforcement              |
+| [Husky](https://typicode.github.io/husky/)              | Git hooks                                     |
+| [commitlint](https://commitlint.js.org/)                | Conventional Commits enforcement              |
 
 ## Contributing
 

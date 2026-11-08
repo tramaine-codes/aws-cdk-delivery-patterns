@@ -1,8 +1,8 @@
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as cdk from 'aws-cdk-lib/core';
 import { describe, test } from 'vitest';
-import { LoggingStack } from '../../../lib/logging/logging-stack.js';
 import { ApplicationStack } from '../../../lib/application/application-stack.js';
+import { LoggingStack } from '../../../lib/logging/logging-stack.js';
 
 describe('ApplicationStack', () => {
   const app = new cdk.App();

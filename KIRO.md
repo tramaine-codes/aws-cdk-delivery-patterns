@@ -9,6 +9,7 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
 ### Entry Point
 
 **`bin/aws-cdk-delivery-patterns.ts`** — CDK app entry point that:
+
 - Instantiates all stacks and passes them to `cdk.App`
 - Applies `AwsSolutionsChecks` from cdk-nag to the entire app
 - Defines the AWS environment (account from env var, region hardcoded to `us-east-1`)
@@ -173,30 +174,36 @@ npx cdk deploy
 ### Addressed in Code
 
 **`AwsSolutions-S1`** — S3 buckets missing server access logging
+
 - `ArtifactsBucket` provisions its own internal logging bucket (self-contained within the construct)
 - Within `ApplicationStage`, a stage-local `LoggingStack` is deployed alongside `ApplicationStack`, and the application bucket sends access logs to that bucket
 
 ### Suppressed Findings
 
 **`AwsSolutions-S1`** — Applied to server access logs buckets in `LoggingStack` and within `ArtifactsBucket`
+
 - A logging bucket cannot send its own access logs to itself without a circular dependency
 
 **`AwsSolutions-CB4`** — Applied at the stack level in `DeliveryPipelineStack`
+
 - CDK Pipelines creates CodeBuild projects internally (Synth, SelfMutation, asset publishing)
 - `CodeBuildOptions` does not expose an `encryptionKey` property, so there is no API surface to set a KMS key on these projects directly
 
 **`AwsSolutions-IAM5`** — Applied at the stack level in `DeliveryPipelineStack`
+
 - CDK Pipelines and CodePipeline generate IAM policies with wildcard actions (e.g., `s3:GetObject*`, `s3:List*`) and wildcard resources
 - These policies are produced entirely by CDK internals and cannot be further constrained through the available construct APIs
 
 ## Workflow
 
 After each code change:
+
 1. Run `npm run build` to type-check
 2. Run `npm test` to verify tests pass
 3. Run `npx cdk synth` to verify CDK synthesis and cdk-nag checks pass
 
 Before committing:
+
 - The pre-commit hook will automatically run `npm run build:ci` and `lint-staged`
 - Ensure all tests pass and code is properly formatted
 
@@ -230,6 +237,7 @@ Before committing:
 ## Project Context
 
 This project demonstrates:
+
 - Self-mutating CDK Pipelines with CodeCommit source
 - Pipeline-managed foundational infrastructure (networking, logging) via `FoundationalStage`
 - Stage-local resource provisioning to maintain cross-stack references within stage boundaries

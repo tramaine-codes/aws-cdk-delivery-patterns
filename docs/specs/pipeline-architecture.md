@@ -7,6 +7,7 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 ## Architecture Components
 
 ### Source Control
+
 - **Service**: AWS CodeCommit
 - **Repository**: `aws-cdk-delivery-patterns`
 - **Branch**: `main`
@@ -15,10 +16,12 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 ### Pipeline Stages
 
 #### 1. Source Stage
+
 - Pulls code from CodeCommit
 - Triggered on push to main
 
 #### 2. Build (Synth) Stage
+
 - **Build Image**: CodeBuild Standard 7.0
 - **Runtime**: Node.js 24, npm 11.11.0
 - **Commands**:
@@ -27,15 +30,18 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
   - `npx cdk synth`
 
 #### 3. UpdatePipeline (Self-Mutation) Stage
+
 - Updates pipeline if pipeline code changed
 - Pipeline restarts automatically after mutation
 
 #### 4. Foundational Deployment Stage
+
 - Deploys `FoundationalStage`:
   - `LoggingStack` (shared server access logs bucket)
   - `NetworkStack` (VPC, subnets, VPC endpoints)
 
 #### 5. Application Deployment Stage (Dev)
+
 - Deploys `ApplicationStage`:
   - `LoggingStack` (stage-local)
   - `ApplicationStack`
@@ -43,6 +49,7 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 ### Artifacts Management
 
 #### Artifacts Bucket
+
 - **Encryption**: KMS customer-managed key
 - **Key Rotation**: Enabled
 - **Access Logging**: To an internal logging bucket managed within `ArtifactsBucket`
@@ -50,6 +57,7 @@ Self-mutating CI/CD pipeline using AWS CDK Pipelines that automatically deploys 
 - **SSL**: Enforced
 
 #### Artifacts KMS Key
+
 - **Alias**: `alias/aws-cdk-delivery-patterns/pipeline-artifacts`
 - **Rotation**: Enabled
 
@@ -68,12 +76,14 @@ RepositoryStack ────> DeliveryPipelineStack
 ## Deployment Process
 
 ### Initial Setup (One-Time Manual Steps)
+
 1. Deploy `RepositoryStack`
 2. Configure CodeCommit remote
 3. Deploy `DeliveryPipelineStack`
 4. Push to CodeCommit main — pipeline takes over from here
 
 ### Subsequent Updates
+
 1. Make code changes
 2. Commit (Conventional Commits)
 3. Push to CodeCommit
@@ -94,6 +104,7 @@ RepositoryStack ────> DeliveryPipelineStack
 ## Extensibility
 
 ### Adding Environments
+
 ```typescript
 new DeliveryPipeline(this, 'Pipeline', {
   applicationStage: new ApplicationStage(this, 'Prod', { env }),
@@ -104,5 +115,6 @@ new DeliveryPipeline(this, 'Pipeline', {
 ```
 
 ### Adding Pre/Post Steps
+
 - Use `addPre()` or `addPost()` on stage
 - Can add manual approvals or tests

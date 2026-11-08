@@ -7,6 +7,7 @@ Security controls and compliance checks enforced through cdk-nag `AwsSolutionsCh
 ## Compliance Framework
 
 ### Tool: cdk-nag
+
 - **Version**: 2.37.55
 - **Rule Pack**: `AwsSolutionsChecks`
 - **Enforcement**: Synthesis-time (fails on violations)
@@ -17,6 +18,7 @@ Security controls and compliance checks enforced through cdk-nag `AwsSolutionsCh
 ### S3 Buckets
 
 #### Mandatory Controls
+
 1. **Public Access Block**: All four settings enabled
 2. **Server Access Logging**: All buckets except logs bucket itself
 3. **Encryption at Rest**: S3-managed or KMS
@@ -26,28 +28,33 @@ Security controls and compliance checks enforced through cdk-nag `AwsSolutionsCh
 ### KMS Keys
 
 #### Mandatory Controls
+
 1. **Key Rotation**: Enabled on all keys
 2. **Alias**: Descriptive alias for identification
 
 ### IAM Policies
 
 **`AwsSolutions-IAM5`** — Wildcard permissions
+
 - **Status**: Suppressed (DeliveryPipelineStack)
 - **Reason**: CDK Pipelines generates wildcards internally
 
 ### CodeBuild Projects
 
 **`AwsSolutions-CB4`** — KMS encryption
+
 - **Status**: Suppressed (DeliveryPipelineStack)
 - **Reason**: CDK Pipelines doesn't expose encryption key API
 
 ## Current Suppressions
 
 ### Stack-Level
+
 - `AwsSolutions-CB4`: CodeBuild encryption (DeliveryPipelineStack)
 - `AwsSolutions-IAM5`: Wildcard IAM (DeliveryPipelineStack)
 
 ### Resource-Level
+
 - `AwsSolutions-S1`: Server access logs bucket in `LoggingStack`
 - `AwsSolutions-S1`: Internal logging bucket within `ArtifactsBucket`
 

@@ -7,18 +7,21 @@ Unit testing strategy using Vitest and CDK assertions to verify infrastructure c
 ## Testing Framework
 
 ### Tool: Vitest
+
 - **Version**: 4.0.18
 - **Config**: `vite.config.unit.ts`
 - **Test Location**: `test/unit/`
 - **Structure**: Mirrors `lib/` directory structure
 
 ### CDK Assertions
+
 - **Package**: `aws-cdk-lib/assertions`
 - **Primary API**: `Template.fromStack()`
 
 ## Test Organization
 
 ### Directory Structure
+
 ```
 test/unit/
 ├── application/
@@ -44,6 +47,7 @@ test/unit/
 ## Testing Patterns
 
 ### Stack Setup Pattern
+
 ```typescript
 describe('StackName', () => {
   const app = new cdk.App();
@@ -59,59 +63,66 @@ describe('StackName', () => {
 ### Assertion Types
 
 #### 1. Resource Properties
+
 ```typescript
 template.hasResourceProperties('AWS::S3::Bucket', {
   BucketEncryption: {
     ServerSideEncryptionConfiguration: [
-      { ServerSideEncryptionByDefault: { SSEAlgorithm: 'AES256' } }
-    ]
-  }
+      { ServerSideEncryptionByDefault: { SSEAlgorithm: 'AES256' } },
+    ],
+  },
 });
 ```
 
 #### 2. Resource Metadata
+
 ```typescript
 template.hasResource('AWS::KMS::Key', {
   DeletionPolicy: 'Delete',
-  UpdateReplacePolicy: 'Delete'
+  UpdateReplacePolicy: 'Delete',
 });
 ```
 
 #### 3. Partial Matching
+
 ```typescript
 template.hasResourceProperties('AWS::S3::BucketPolicy', {
   PolicyDocument: Match.objectLike({
     Statement: Match.arrayWith([
       Match.objectLike({
         Action: 's3:*',
-        Effect: 'Deny'
-      })
-    ])
-  })
+        Effect: 'Deny',
+      }),
+    ]),
+  }),
 });
 ```
 
 ## Test Coverage Areas
 
 ### Security Controls
+
 - Public access block configuration
 - SSL enforcement policies
 - Encryption settings
 - Access logging configuration
 
 ### Resource Configuration
+
 - Removal policies
 - Versioning settings
 - Key rotation
 - Bucket policies
 
 ### Compliance
+
 - cdk-nag suppressions applied correctly
 - Required properties present
 
 ## Running Tests
 
 ### Commands
+
 ```bash
 # Run all tests
 npm test
@@ -127,33 +138,38 @@ npm run test:cov
 ```
 
 ### CI Integration
+
 - Pre-commit hook runs `npm run build:ci` (includes tests)
 - Pipeline synth stage runs `npm run build` (type-check only)
 
 ## Test Conventions
 
 ### One Assertion Per Test
+
 Each test should verify one specific behavior:
+
 ```typescript
 test('creates a KMS key with an alias', () => {
   template.hasResourceProperties('AWS::KMS::Alias', {
-    AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts'
+    AliasName: 'alias/aws-cdk-delivery-patterns/pipeline-artifacts',
   });
 });
 
 test('enables key rotation', () => {
   template.hasResourceProperties('AWS::KMS::Key', {
-    EnableKeyRotation: true
+    EnableKeyRotation: true,
   });
 });
 ```
 
 ### Descriptive Test Names
+
 - Use clear, behavior-focused descriptions
 - Avoid technical jargon in test names
 - Focus on "what" not "how"
 
 ### Test Organization
+
 - Group related tests with `describe()` blocks
 - One `describe()` per construct/stack
 - Nested `describe()` for complex constructs
@@ -161,12 +177,14 @@ test('enables key rotation', () => {
 ## Coverage Goals
 
 ### Current Coverage
+
 - All stacks have unit tests
 - All custom constructs have unit tests
 - Security controls verified
 - Resource configuration verified
 
 ### Not Covered
+
 - Integration tests (actual deployment)
 - End-to-end pipeline execution
 - Cross-stack reference validation
@@ -175,6 +193,7 @@ test('enables key rotation', () => {
 ## Future Enhancements
 
 ### Potential Improvements
+
 1. **Integration Tests**: Deploy to test account, verify resources
 2. **Snapshot Tests**: Capture CloudFormation template snapshots
 3. **Property-Based Tests**: Generate random valid configurations
