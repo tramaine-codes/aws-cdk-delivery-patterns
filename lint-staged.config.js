@@ -1,4 +1,4 @@
 export default {
-  '*.{js,json,ts,md}': 'biome format --fix --no-errors-on-unmatched',
-  '*.{js,ts}': 'biome lint --fix --no-errors-on-unmatched',
+  '*.{js,json,md,ts,yml}':
+    'biome check --write --no-errors-on-unmatched --files-ignore-unknown=true',
 };

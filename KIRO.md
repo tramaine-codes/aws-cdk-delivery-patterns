@@ -79,7 +79,7 @@ This is an AWS CDK TypeScript project demonstrating cloud delivery patterns with
   - Use `NagSuppressions` to suppress findings that cannot be fixed in code; always include a `reason`
 - **Commit convention**: Conventional Commits enforced via commitlint + husky
 - **Dependency updates**: [npm-check-updates](https://github.com/raineorshine/npm-check-updates) with config in `.ncurc.cjs`. Targets latest versions for all packages except `@types/node`, which is pinned to minor updates only.
-- **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (biome format + lint on staged files)
+- **Pre-commit hook**: Runs `npm run build:ci` (clean → test → tsc) and `lint-staged` (`biome check --write` on staged files)
 
 ## Commands
 
@@ -99,10 +99,10 @@ npx vitest run --dir test/unit --config ./vite.config.unit.ts test/unit/<filenam
 # Run tests with coverage
 npm run test:cov
 
-# Lint
+# Lint, check formatting, and check import order
 npm run lint
 
-# Lint with auto-fix
+# Same checks with auto-fix
 npm run lint:fix
 
 # Format

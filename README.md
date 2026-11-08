@@ -95,10 +95,10 @@ npm run build
 # Watch mode
 npm run watch
 
-# Lint
+# Lint, check formatting, and check import order
 npm run lint
 
-# Lint with auto-fix
+# Same checks with auto-fix
 npm run lint:fix
 
 # Format
@@ -197,7 +197,7 @@ npx cdk deploy
 npm run build:ci
 ```
 
-The pre-commit hook runs `npm run build:ci` and `lint-staged` (Biome format + lint on staged files) automatically via Husky.
+The pre-commit hook runs `npm run build:ci` and `lint-staged` (`biome check --write` on staged files) automatically via Husky.
 
 ## Tooling
 
